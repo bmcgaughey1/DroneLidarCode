@@ -18,12 +18,12 @@ within the study areas were also collected. The data are high density
 (over 800 pulses per square meter) and provide highly detailed
 information about the upper- and mid-canopy vegetation. The point cloud
 data is not available in the repository but is accessible on a shared
-drive and available to project collaborators. Subsamples of the data for
+drive and available to project collaborators. Samples of the data for
 specific field plots are available
 [here](http://forsys.sefs.uw.edu/transfer/T3Plots/).
 
 ![Point cloud data showing young trees with scattered older
-trees](extras/lidardata.jpg?raw=true)
+trees](extras/lidardata.png?raw=true)
 
 This repository contains the field data and analysis code used to
 develop useful products from the lidar data and to explore some specific
