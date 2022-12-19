@@ -23,7 +23,7 @@ specific field plots are available
 [here](http://forsys.sefs.uw.edu/transfer/T3Plots/).
 
 ![Point cloud data showing young trees with scattered older
-trees](extras/lidardata.jpg)
+trees](extras/lidardata.jpg?raw=true)
 
 This repository contains the field data and analysis code used to
 develop useful products from the lidar data and to explore some specific
