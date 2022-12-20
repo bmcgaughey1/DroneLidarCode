@@ -20,7 +20,10 @@ information about the upper- and mid-canopy vegetation. The point cloud
 data is not available in the repository but is accessible on a shared
 drive and available to project collaborators. Samples of the data for
 specific field plots are available
-[here](http://forsys.sefs.uw.edu/transfer/T3Plots/).
+[here](http://forsys.sefs.uw.edu/transfer/T3Plots/). This
+[document](extras/T3_drone_lidar_plots.pdf) has some instructions for
+using the plot data in FUSION to visualize the point cloud and measured
+trees.
 
 ![Point cloud data showing young trees with scattered older
 trees](extras/lidardata.png?raw=true)
@@ -33,6 +36,20 @@ morphology and intensity values.
 
 While not specifically intended for broad distribution, the code is
 available in this public repository for all to enjoy!!
+
+## Field data
+
+The field data consists of a single excel spreadsheet with all of the
+measured trees and a shapefile with the plot center locations. Locations
+were collected using a Javad Triumph 2 GNSS receiver and post processed
+using a nearby base station. With the receiver, we expect locations
+within 1-2m of the true location. However, larger errors are possible
+given the dense canopy conditions and steep slopes. The following files
+are available: \* [Field plot locations](extras/plot_centers_UTM.zip) \*
+[T3 treatment units](extras/Units_UTM10.zip) \* [Tree
+data](2021_T3_Upland+Trees.xlsx)
+
+## Installation
 
 There is no formal install process related to this code. However, you
 can simply clone the repository to your local computer. The easiest way
