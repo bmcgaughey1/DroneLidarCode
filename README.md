@@ -81,8 +81,8 @@ errors.
 
 This code creates an index of all of the drone data flown in 2022 by
 reading the extent of the individual point files. This code includes
-some functions that read LAS/LAZ file headers directly and functions to
-build directory listings based on a wildcard specification,
+some functions that read LAS/LAZ file headers directly (byte values) and
+functions to build directory listings based on a wildcard specification,
 e.g. “\*.laz”. Output is a geopackage file and a shapefile with all tile
 extents. Some field names are truncated in the shapefile to comply with
 limitations of the shapefile format (and ESRI’s implementation of the
