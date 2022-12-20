@@ -37,6 +37,28 @@ morphology and intensity values.
 While not specifically intended for broad distribution, the code is
 available in this public repository for all to enjoy!!
 
+## R code
+
+All R code files are located in the Rcode folder. While I eventually
+want to move all o the analysis code into this repository, I am still
+organizing and documenting code so not everything is ready to move into
+the repository. Each of the code files are described below.
+
+### [Process2022Data.R](Rcode/Process2022Data.R)
+
+This code takes the drone lidar data flow in 2022 as input and produces
+a set of outputs that includes the canopy height and surface models,
+individual tree related products (high point locations, crown perimeter
+polygons, point clips for each tree), and point clips for the upper 3m
+of the tree crowns used for species classification work using random
+forest. This code uses the
+[fusionwrapr](https://github.com/bmcgaughey1/fusionwrapr) package to
+interface with FUSION command line tools so you will need a full working
+installation of FUSION to use this code. For the 2022 data, this code
+takes several days to run on a moderately powerful laptop. When I
+processed the 2021 data, I was running on a desktop system with better
+performance. The 2021 data was smaller and processed in less than 1 day.
+
 ## Field data
 
 The field data consists of a single excel spreadsheet with all of the
@@ -44,10 +66,23 @@ measured trees and a shapefile with the plot center locations. Locations
 were collected using a Javad Triumph 2 GNSS receiver and post processed
 using a nearby base station. With the receiver, we expect locations
 within 1-2m of the true location. However, larger errors are possible
-given the dense canopy conditions and steep slopes. The following files
-are available: \* [Field plot locations](extras/plot_centers_UTM.zip) \*
-[T3 treatment units](extras/Units_UTM10.zip) \* [Tree
-data](2021_T3_Upland+Trees.xlsx)
+given the dense canopy conditions and steep slopes. Plots, except plot
+6, are 1/4 acre with a radius of 17.68m. Plot 6 has a radius of 7.8m.
+
+Individual tree locations were computing using the field-measured
+distance and azimuth from the plot reference point (usually a single
+tree dor each plot). Tree locations were adjusted manually using
+specially modified versions of FUSION and LDV. The adjustment
+capabilities included the ability to shift the entire plot as well as
+individual trees. In addition, tree tops can be moved while keeping the
+tree base fixed to allow alignment with the point cloud for leaning
+trees.
+
+The following files are available:
+
+-   [Field plot locations](extras/plot_centers_UTM.zip)
+-   [T3 treatment units](extras/Units_UTM10.zip)
+-   [Tree measurement data](2021_T3_Upland_Trees.xlsx)
 
 ## Installation
 
