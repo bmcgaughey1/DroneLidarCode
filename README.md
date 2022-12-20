@@ -40,7 +40,7 @@ available in this public repository for all to enjoy!!
 ## R code
 
 All R code files are located in the Rcode folder. While I eventually
-want to move all o the analysis code into this repository, I am still
+want to move all of the analysis code into this repository, I am still
 organizing and documenting code so not everything is ready to move into
 the repository. Each of the code files are described below.
 
@@ -82,7 +82,7 @@ The following files are available:
 
 -   [Field plot locations](extras/plot_centers_UTM.zip)
 -   [T3 treatment units](extras/Units_UTM10.zip)
--   [Tree measurement data](2021_T3_Upland_Trees.xlsx)
+-   [Tree measurement data](extras/2021_T3_Upland_Trees.xlsx)
 
 ## Installation
 
