@@ -42,6 +42,10 @@ This code takes the drone lidar data flow in 2022 as input and produces a set of
 
 This code uses the lidar-derived metrics (2021 lidar and 2021 plots) for the upper 3m of the individual tree crowns (matched to field-measured trees) to build a classification model using random forest (RF) to distinguish Douglas-fir from western hemlock. In the code, there are some options for tuning the hyperparameters in random forest. The simple tuning only works on the mtry parameter. The other tuning deals with mtry, ntrees, and nodesize. Be warned that the more complex tuning takes MUCH longer to run. This files also has some code to produce plots of the most useful metrics, based on importance scores from RF, and to craete a list of point clips for misclassified individaul trees. This last product is useful for understanding what causes classification errors.
 
+### [IndexDroneLidar2022.R](Rcode/IndexDroneLidar2022.R)
+
+This code creates an index of all of the drone data flown in 2022 by reading the extent of the individual point files. This code includes some functions that read LAS/LAZ file headers directly and functions to build directory listings based on a wildcard specification, e.g. "*.laz". Output is a geopackage file and a shapefile with all tile extents. Some field names are truncated in the shapefile to comply with limitations of the shapefile format (and ESRI's implementation of the format).
+
 ## Field data
 
 The field data consists of a single excel spreadsheet with all of the measured trees and a shapefile with the plot center locations. Locations were collected using a Javad Triumph 2 GNSS receiver and post processed using a nearby base station. With the receiver, we expect locations within 1-2m of the true location. However, larger errors are possible given the dense canopy conditions and steep slopes. Plots, except plot 6, are 1/4 acre with a radius of 17.68m. Plot 6 has a radius of 7.8m.
