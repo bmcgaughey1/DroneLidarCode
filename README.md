@@ -18,8 +18,11 @@ within the study areas were also collected. The data are high density
 (over 800 pulses per square meter) and provide highly detailed
 information about the upper- and mid-canopy vegetation. The point cloud
 data is not available in the repository but is accessible on a shared
-drive and available to project collaborators. Samples of the data for
-specific field plots are available
+drive and available to project collaborators.
+
+## Lidar data
+
+Samples of the data for specific field plots are available
 [here](http://forsys.sefs.uw.edu/transfer/T3Plots/). This
 [document](extras/T3_drone_lidar_plots.pdf) has some instructions for
 using the plot data in FUSION to visualize the point cloud and measured
@@ -59,6 +62,21 @@ takes several days to run on a moderately powerful laptop. When I
 processed the 2021 data, I was running on a desktop system with better
 performance. The 2021 data was smaller and processed in less than 1 day.
 
+### [speciesModeling.R](Rcode/speciesModeling.R)
+
+This code uses the lidar-derived metrics (2021 lidar and 2021 plots) for
+the upper 3m of the individual tree crowns (matched to field-measured
+trees) to build a classification model using random forest (RF) to
+distinguish Douglas-fir from western hemlock. In the code, there are
+some options for tuning the hyperparameters in random forest. The simple
+tuning only works on the mtry parameter. The other tuning deals with
+mtry, ntrees, and nodesize. Be warned that the more complex tuning takes
+MUCH longer to run. This files also has some code to produce plots of
+the most useful metrics, based on importance scores from RF, and to
+craete a list of point clips for misclassified individaul trees. This
+last product is useful for understanding what causes classification
+errors.
+
 ## Field data
 
 The field data consists of a single excel spreadsheet with all of the
@@ -83,6 +101,9 @@ The following files are available:
 -   [Field plot locations](extras/plot_centers_UTM.zip)
 -   [T3 treatment units](extras/Units_UTM10.zip)
 -   [Tree measurement data](extras/2021_T3_Upland_Trees.xlsx)
+-   [Lidar-derived metrics for upper 3m of individual tree crowns used
+    to develop the RF classification
+    model](extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv)
 
 ## Installation
 
