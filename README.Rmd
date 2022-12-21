@@ -32,7 +32,7 @@ While not specifically intended for broad distribution, the code is available in
 
 ## R code
 
-All R code files are located in the Rcode folder. While I eventually want to move all of the analysis code into this repository, I am still organizing and documenting code so not everything is ready to move into the repository. Each of the code files are described below.
+All R code files are located in the Rcode folder. While I eventually want to move all of the analysis code into this repository, I am still organizing and documenting code so not everything is ready to move into the repository. Most of this code has some file paths and file names that are specific to my computer. For the most part, such things are near the beginning of the code and can be easily changed to match your own computer and drive letters. Each of the code files are described below.
 
 ### [Process2022Data.R](Rcode/Process2022Data.R)
 
