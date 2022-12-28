@@ -105,7 +105,7 @@ Note that the functions in the code have very specific requirements for
 the units of measurement for DBH and height (both input and output). I
 expect that I will change the functions or add an over-arching function
 that cleans up the unit confusion and allows you to use both equation
-sets using the same function call.
+sets using the same function call (issue \#4).
 
 ## Field data
 
