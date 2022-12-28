@@ -46,6 +46,17 @@ This code uses the lidar-derived metrics (2021 lidar and 2021 plots) for the upp
 
 This code creates an index of all of the drone data flown in 2022 by reading the extent of the individual point files. This code includes some functions that read LAS/LAZ file headers directly (byte values) and functions to build directory listings based on a wildcard specification, e.g. "*.laz". Output is a geopackage file and a shapefile with all tile extents. Some field names are truncated in the shapefile to comply with limitations of the shapefile format (and ESRI's implementation of the format).
 
+### [predictDBH_Height.R](Rcode/predictDBH_Height.R)
+
+This code implements functions to predict DBH or height using equations from FVS (Pacific coast variant) or
+
+> Hanus, M.L., D.D. Marshall, and D.W. Hann. 1999. Height-diameter equations for six species in the coastal regions 
+of the Pacific Northwest.  Forestry Research Laboratory, contribution 25.  11 p.
+
+Note that the functions in the code have very specific requirements for the units of measurement for DBH and height (both input and output).
+I expect that I will change the functions or add an over-arching function that cleans up the unit confusion and allows you to use both 
+equation sets using the same function call.
+
 ## Field data
 
 The field data consists of a single excel spreadsheet with all of the measured trees and a shapefile with the plot center locations. Locations were collected using a Javad Triumph 2 GNSS receiver and post processed using a nearby base station. With the receiver, we expect locations within 1-2m of the true location. However, larger errors are possible given the dense canopy conditions and steep slopes. Plots, except plot 6, are 1/4 acre with a radius of 17.68m. Plot 6 has a radius of 7.8m.

@@ -3,7 +3,7 @@
 library(randomForest)
 library(dplyr)
 library(caret)
-library(xgboost) 
+library(xgboost)
 library(ggplot2)
 
 #
@@ -24,7 +24,7 @@ inputData <- read.csv(inputDataFile, stringsAsFactors = FALSE)
 
 # compute relative percentiles...divide P?? by P99. I use these when dealing with clips of individual trees
 # to allow the use of percentiles in cases where one species is much higher than another
-# 
+#
 # for this case with the point clips for the upper 3m of crowns, these are less useful (but still useful)
 inputData$RP01 <- inputData$Elev.P01 / inputData$Elev.P99
 inputData$RP05 <- inputData$Elev.P05 / inputData$Elev.P99
@@ -107,24 +107,24 @@ table(modelData$Species)
 # flag for model tuning. If TRUE, only mtry is tuned. Otherwise, more parameters are tuned
 # using caret procedures from https://stackoverflow.com/questions/57939453/building-a-randomforest-with-caret
 #
-# *****downside is that the more complex tuning requires that you look at the outputs to find the best set of 
+# *****downside is that the more complex tuning requires that you look at the outputs to find the best set of
 # hyperparameters. This would be much better if the code selected the best set and then used the parameters
 # to fit the final model.
 #
 # The more advanced tuning also takes much longer to run. In the initial testing, the improvement in model
-# performance wasn't that great. 
+# performance wasn't that great.
 simpleTune <- FALSE
 
 if (simpleTune) {
   # use a tuning function to find the best mtry value (lowest OOB error)
   # the best value will very depending on the random number seed (be careful if you rerun this code without initializing the seed above)
-  bestmtry <- tuneRF(trainingData[, -1], trainingData$Species, ntreeTry = 1000, stepFactor = 1.5, improve = 0.01, trace=T, plot= T) 
+  bestmtry <- tuneRF(trainingData[, -1], trainingData$Species, ntreeTry = 1000, stepFactor = 1.5, improve = 0.01, trace=T, plot= T)
   i <- which(bestmtry==min(bestmtry), arr.ind = TRUE)
   bestmtry <- bestmtry[i[1]]
   #bestmtry <- 13
   #bestmtry <- 19
   print(paste("Best value for mtry = ", bestmtry))
-  
+
   # build a random forest model using the training data... we have more TSHE than PSME so use sampsize
   # parameter to equalize the sample. Balanced sample probably isn't needed...species counts aren't that
   # different (247 PSME & 278 TSHE). Accuracy is slightly (0.65%) better when NOT balancing the sample.
@@ -143,10 +143,10 @@ if (simpleTune) {
   # create predefined folds
   set.seed(1234)
   cv_folds <- createFolds(modelData$Species, k = 5, returnTrain = TRUE)
-  
+
   # create tune control
   tuneGrid <- expand.grid(.mtry = c(1 : 15))
-  
+
   # default summary
   # ***** need to define metric = "Kappa" in call to train()
   # ctrl <- trainControl(method = "cv",
@@ -155,22 +155,22 @@ if (simpleTune) {
   #                      classProbs = TRUE,
   #                      savePredictions = "final",
   #                      index = cv_folds)
-  
+
   ctrl <- trainControl(method = "cv",
                        number = 5,
                        search = 'grid',
                        classProbs = TRUE,
                        savePredictions = "final",
                        index = cv_folds,
-                       summaryFunction = twoClassSummary) #in most cases a better summary for two class problems 
-  
+                       summaryFunction = twoClassSummary) #in most cases a better summary for two class problems
+
   # add more parameters to tune...also adds run time
-  ntrees <- c(250, 500, 1000)    
+  ntrees <- c(250, 500, 1000)
   nodesize <- c(1, 2, 4, 6)
-  
+
   params <- expand.grid(ntrees = ntrees,
                         nodesize = nodesize)
-  
+
   # train model
   store_maxnode <- vector("list", nrow(params))
   for(i in 1:nrow(params)) {
@@ -189,19 +189,19 @@ if (simpleTune) {
                       nodesize = nodesize)
     store_maxnode[[i]] <- rf_model
   }
-  
+
   # add names to list using parameters
   names(store_maxnode) <- paste("ntrees:", params$ntrees,
                                 "nodesize:", params$nodesize)
-  
+
   # combine results
   results_mtry <- resamples(store_maxnode)
-  
+
   summary(results_mtry)
-  
+
   # get best mtry for model
   lapply(store_maxnode, function(x) x$best)
-  
+
   # get best average performance for models
   t <- lapply(store_maxnode, function(x) x$results[x$results$ROC == max(x$results$ROC),])
 
@@ -221,8 +221,8 @@ if (simpleTune) {
       bestntree <- params[i,1]
     }
   }
-  
-  
+
+
   # run best model after looking at results to find model with highest ROC
   speciesRF <- randomForest(Species ~ .
                             , data = trainingData
@@ -234,7 +234,7 @@ if (simpleTune) {
                             , ntree = bestntree
                             , nodesize = bestnodesize
   )
-  
+
   print(paste("Best model based on area under ROC:"))
   print(paste("   mtry = ", bestmtry))
   print(paste("   ntree = ", bestntree))
@@ -242,6 +242,8 @@ if (simpleTune) {
   print(paste("   ROC value = ", bestROC))
 }
 
+# save model for later use
+saveRDS(speciesRF, "FINAL_RF_HW_DF_Model.rds")
 speciesRF
 
 # compute accuracy for training data...should give same result as model summary but row/columns will be "correct"
@@ -311,23 +313,23 @@ t$actual != t$predicted
 
 typePred <- speciesRF$predicted
 table(typePred, trainingData$Species)
- 
+
 CM <- table(typePred, trainingData$Species)
 accuracy <- (sum(diag(CM)))/sum(CM)
 accuracy
- 
+
 # predict species for testing data and generate a normal confusion matrix
 speciesPred <- predict(speciesRF, newdata = testingData)
 testingCM <- confusionMatrix(speciesPred, testingData$Species)
 message("--TESTING DATA--")
 testingCM
- 
+
 # predict species for all data (PSEM & TSHE only) and generate a normal confusion matrix
 speciesPred <- predict(speciesRF, newdata = modelData)
 allCM <- confusionMatrix(speciesPred, modelData$Species)
 message("--ALL DATA--")
 allCM
- 
+
 # filter PSME & TSHE from original input data so we can get back the file name for the point clips
 originalData <- dplyr::filter(inputData, Species == "PSME" | Species == "TSHE")
 originalData$Species <- as.factor(originalData$Species)
@@ -336,14 +338,14 @@ speciesPred <- predict(speciesRF, newdata = originalData)
 allCM <- confusionMatrix(speciesPred, originalData$Species)
 message("--ORIGINAL DATA--")
 allCM
- 
+
 # assign predicted species to new column and save data
 originalData$PredictedSpecies <- speciesPred
 
 write.csv(originalData, file = "G:/R_Stuff/ONRCDroneLidar/T3_Predicted_Species_AllPlots.csv", row.names = FALSE)
 
 # read in data with predicted species and file names, look for incorrect classifications and
-# build a batch file to display point clips for trees 
+# build a batch file to display point clips for trees
 inData <- read.csv("G:/R_Stuff/ONRCDroneLidar/T3_Predicted_Species_AllPlots.csv", stringsAsFactors = FALSE)
 
 inData <- dplyr::filter(inData, Species != PredictedSpecies)
@@ -368,8 +370,8 @@ test_y <- testingData[, 1]
 xgb_train <- xgb.DMatrix(data = train_x, label = train_y)
 xgb_test <- xgb.DMatrix(data = test_x, label = test_y)
 
-model <- xgboost(data = xgb_train,                    # the data   
-                 max.depth = 3,                           # max depth 
+model <- xgboost(data = xgb_train,                    # the data
+                 max.depth = 3,                           # max depth
                  nrounds = 50)                              # max number of boosting iterations
 
 summary(model)

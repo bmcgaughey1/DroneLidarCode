@@ -92,6 +92,21 @@ extents. Some field names are truncated in the shapefile to comply with
 limitations of the shapefile format (and ESRI’s implementation of the
 format).
 
+### [predictDBH_Height.R](Rcode/predictDBH_Height.R)
+
+This code implements functions to predict DBH or height using equations
+from FVS (Pacific coast variant) or
+
+> Hanus, M.L., D.D. Marshall, and D.W. Hann. 1999. Height-diameter
+> equations for six species in the coastal regions of the Pacific
+> Northwest. Forestry Research Laboratory, contribution 25. 11 p.
+
+Note that the functions in the code have very specific requirements for
+the units of measurement for DBH and height (both input and output). I
+expect that I will change the functions or add an over-arching function
+that cleans up the unit confusion and allows you to use both equation
+sets using the same function call.
+
 ## Field data
 
 The field data consists of a single excel spreadsheet with all of the
