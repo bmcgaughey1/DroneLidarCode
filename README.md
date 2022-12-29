@@ -138,8 +138,13 @@ The following files are available:
 
 ## Installation
 
-There is no formal install process related to this code. However, you
-can simply clone the repository to your local computer. The easiest way
-to do this is to click the button labeled “\<\> Code” on the repository
-home page. Then click “download ZIP”. Once on your local computer, you
-can unzip the repository into a folder of your choosing.
+There is no formal install process related to this code. If you want
+everything, you can clone the repository to your local computer. The
+easiest way to do this is to click the button labeled “\<\> Code” on the
+repository home page. Then click “download ZIP”. Once on your local
+computer, you can unzip the repository into a folder of your choosing.
+You can also copy code from individual files into your local RStudio
+session. The process for accessing code in individual files (and CSV or
+XLSX files) is different depending on the file type. In general, you
+always want to copy “raw” text to avoid getting line numbers or other
+decoration in the copied text.
