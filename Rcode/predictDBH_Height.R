@@ -8,14 +8,72 @@
 # *****This means you need to use a loop to all the functions instead of passing a list of "trees"
 
 # *****Functions have requirements for units for both DBH and height mentioned in the comments. The Hanus
-# *****functions have a conversion factor for the input measurement but output will always be in the "native"
-# *****units. The FVS function must have DBH in inches and height in feet. This could (and probably will) be
-# *****changed in the future so the functions will work correctly and allow specification of the units of
-# *****measure through function parameters.
+# *****functions have a conversion factor for the input measurement but output will always be in meters.
+# *****The FVS function must have DBH in inches and height in feet.
+
+# *****I added the over-arching functions to predict DBH and height to clean up the unit problems. The original
+# *****functions still exist and they have weird units. Use the over-arching functions!!
+
+# method can be "hanus" or "fvs"
+# heightUnits can be "meters" or "feet"
+# DBHUnits can be "cm" or "inches"
+# location is specific to FVS...refer to the FVS variant documentation for valid values
+
+# over-arching function to predict DBH
+predictDBH <- function(spp, height, method = "hanus", heightUnits = "feet", DBHUnits = "inches", location = 1) {
+  # both methods expect height in feet...convert if heightunits = "meters"
+  theHeight <- height
+  if (tolower(heightUnits) == "meters")
+    theHeight <- height * 3.2808
+
+  # if using FVS, check for species code
+  if (tolower(method) == "fvs") {
+    if (spp == "ALRU") spp <- "ALRU2"
+    if (spp == "PIMO") spp <- "PIMO3"
+
+    theDBH <- predictFVS(spp, height = theHeight, mode = 1, location = location)
+  }
+  else {
+    theDBH <- predictDBHHanus(spp, theHeight, conversionFactor = 1.0)
+  }
+
+  # deal with DBH units
+  if (tolower(DBHUnits) == "cm") {
+    theDBH <- theDBH * 2.54
+  }
+
+  return(invisible(theDBH))
+}
+
+# over-arching function to predict height
+predictHeight <- function(spp, dbh, method = "hanus", heightUnits = "feet", DBHUnits = "inches", location = 1) {
+  # both methods expect DBH in inches...convert if DBHUnits = "cm"
+  theDBH <- dbh
+  if (tolower(DBHUnits) == "cm")
+    theDBH <- dbh / 2.54
+
+  # if using FVS, check for species code
+  if (tolower(method) == "fvs") {
+    if (spp == "ALRU") spp <- "ALRU2"
+    if (spp == "PIMO") spp <- "PIMO3"
+
+    theHeight <- predictFVS(spp, dbh = theDBH, mode = 0, location = location)
+  }
+  else {
+    theHeight <- predictHeightHanus(spp, theDBH, conversionFactor = 1.0) * 3.2808
+  }
+
+  # deal with DBH units
+  if (tolower(heightUnits) == "meters") {
+    theHeight <- theHeight / 3.2808
+  }
+
+  return(invisible(theHeight))
+}
 
 # function to predict height (m) given a DBH (cm)
 # DBH can be in inches with conversionFactor = 1.0 but height will still be returned in meters
-predictHeight <- function(spp, DBH, conversionFactor = 2.54) {
+predictHeightHanus <- function(spp, DBH, conversionFactor = 2.54) {
   # Ht = 4.5 + exp(a0 + a1 * DBH^a2)
   # DBH = (ln((Ht - 4.5) / exp(a0)) / a1)^(1 / a2)
   # Ht is in feet and DBH is in inches...hence the need for the conversion factor
@@ -39,7 +97,7 @@ predictHeight <- function(spp, DBH, conversionFactor = 2.54) {
 
 # function to predict DBH (cm) given a height (m)
 # height can be in feet with conversionFactor = 1.0 but DBH will still be returned in cm
-predictDBH <- function(spp, height, conversionFactor = 3.2808) {
+predictDBHHanus <- function(spp, height, conversionFactor = 3.2808) {
   # Ht = 4.5 + exp(a0 + a1 * DBH^a2)
   # DBH = (ln((Ht - 4.5) / exp(a0)) / a1)^(1 / a2)
   # Ht is in feet and DBH is in inches...hence the need for the conversion factor
@@ -283,12 +341,12 @@ predictFVS <- function(spp, height = 0, dbh = 0, location = 1, mode = 0) {
 }
 
 if (FALSE) {
-  # test code
+  # test code for original, method-specific functions
   height = predictFVS("PSME", dbh = 30)
   dbh <- predictFVS("PSME", height = height, mode = 1)
   dbh
 
-  height <- predictHeight("PSME", 30, conversionFactor = 1.0) * 3.2808
+  height <- predictHeightHanus("PSME", 30 * 2.54) * 3.2808
 
   FVSspp <- "PSME"
   Hanusspp <- "PSME"
@@ -297,7 +355,7 @@ if (FALSE) {
   heightHanus <- list()
   for (i in 1:length(dbh)) {
     heightFVS[i] <- predictFVS(FVSspp, dbh = dbh[i])
-    heightHanus[i] <- predictHeight(Hanusspp, dbh[i] * 2.54) * 3.2808
+    heightHanus[i] <- predictHeightHanus(Hanusspp, dbh[i], conversionFactor = 1) * 3.2808
   }
 
   # figure out max height for two models
@@ -311,7 +369,7 @@ if (FALSE) {
 
 
   speciesHanus <- c("PSME", "ALRU", "PISI", "TSHE", "THPL", "PIMO")
-  speciesFVS <- c("PSME", "ALRU3", "PISI", "TSHE", "THPL", "PIMO3")
+  speciesFVS <- c("PSME", "ALRU2", "PISI", "TSHE", "THPL", "PIMO3")
 
   for (j in 1:6) {
     FVSspp <- speciesFVS[j]
@@ -319,7 +377,7 @@ if (FALSE) {
 
       for (i in 1:length(dbh)) {
       heightFVS[i] <- predictFVS(FVSspp, dbh = dbh[i])
-      heightHanus[i] <- predictHeight(Hanusspp, dbh[i] * 2.54) * 3.2808
+      heightHanus[i] <- predictHeightHanus(Hanusspp, dbh[i], conversionFactor = 1) * 3.2808
     }
 
     # figure out max height for two models
@@ -330,4 +388,43 @@ if (FALSE) {
     points(dbh, heightFVS, col = "red")
     legend("topleft", legend = c("Hanus", "FVS"), col = c("black", "red"), pch = 1)
   }
+}
+
+# test code for over-arching functions
+if (FALSE) {
+  spp <- "PSME"
+  dbh = seq(4.0, 40.0, by = 1.0)
+  heightFVS <- list()
+  heightHanus <- list()
+  for (i in 1:length(dbh)) {
+    heightFVS[i] <- predictHeight(spp, dbh[i], method = "fvs", location = 1)
+    heightHanus[i] <- predictHeight(spp, dbh[i], method = "hanus")
+  }
+
+  # figure out max height for two models
+  maxFVSHt <- max(unlist(heightFVS))
+  maxHanusHt <- max(unlist(heightHanus))
+  maxHt <- max(maxFVSHt, maxHanusHt)
+  plot(dbh, heightHanus, main = paste(FVSspp, "height predictions"), ylim = c(20, maxHt))
+  points(dbh, heightFVS, col = "red")
+  legend("topleft", legend = c("Hanus", "FVS"), col = c("black", "red"), pch = 1)
+
+
+  species <- c("PSME", "ALRU", "PISI", "TSHE", "THPL", "PIMO")
+
+  for (j in 1:6) {
+    for (i in 1:length(dbh)) {
+      heightFVS[i] <- predictHeight(species[j], dbh[i], method = "fvs", location = 1)
+      heightHanus[i] <- predictHeight(species[j], dbh[i], method = "hanus")
+    }
+
+    # figure out max height for two models
+    maxFVSHt <- max(unlist(heightFVS))
+    maxHanusHt <- max(unlist(heightHanus))
+    maxHt <- max(maxFVSHt, maxHanusHt)
+    plot(dbh, heightHanus, main = paste(species[j], "height predictions"), ylim = c(20, maxHt + 20))
+    points(dbh, heightFVS, col = "red")
+    legend("topleft", legend = c("Hanus", "FVS"), col = c("black", "red"), pch = 1)
+  }
+
 }
