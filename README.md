@@ -141,10 +141,10 @@ that the predicted value is still on the x axis so it matches the other
 graphs.
 
 ![Field data and DBH predictions using an equation fit to predict
-height](extras/predictHt.png?raw=true)
+height](extras/PredictHt.png?raw=true)
 
 ![Field data and DBH predictions using an equation fit to predict DBH
-directly](extras/predictDBH.png?raw=true)
+directly](extras/PredictDBH.png?raw=true)
 
 ## Field data
 
