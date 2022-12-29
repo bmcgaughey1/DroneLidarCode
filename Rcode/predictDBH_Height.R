@@ -34,7 +34,7 @@ predictDBH <- function(spp, height, method = "hanus", heightUnits = "feet", DBHU
     theDBH <- predictFVS(spp, height = theHeight, mode = 1, location = location)
   }
   else {
-    theDBH <- predictDBHHanus(spp, theHeight, conversionFactor = 1.0)
+    theDBH <- predictDBHHanus(spp, theHeight, conversionFactor = 1.0) / 2.54
   }
 
   # deal with DBH units

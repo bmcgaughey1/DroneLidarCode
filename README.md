@@ -108,6 +108,44 @@ Hanus, et al. and FVS equations. I added over-arching functions that
 allow you to use both methods (methods = “hanus” or method = “fvs”). Use
 these functions instead of the original ones!!
 
+### [HeightDBHModel.R](Rcode/HeightDBHModel.R)
+
+Code the explores the height-DBH relationship using the field-measured
+DBH and lidar-derived height. The Hanus et al. and FVS methods vary
+somewhat but there isn’t really a clear choice for our data. I also fit
+new equations using the same form as Hanus et al. and our data. This new
+model is better. The Hanus et al. and FVS methods fit equations that
+predict height given DBH (since this is typically measured in the
+field). I also fit equations to directly predict DBH given our
+lidar-derived heights. These models are even better and produce less
+biased DBH predictions. We had a reviewer comment regarding the process
+of rearranging a height prediction equation to predict DBH on the wind
+river draft. At the time, I kind of ignored the comment given that the
+only way to “do better” involves field data (which we don’t have for the
+wind river site). Given that we have field measurements of DBH nd
+lidar-derived heights, it makes sense to fit our own model and then use
+it to predict DBH from the lidar-derived heights.
+
+This graph shows the Hanus et al. and FVS predictions and how they
+relate to our data.
+
+![Predicted DBH values given our lidar-derived
+heights](extras/DBH_Ht.png?raw=true)
+
+These next two graphs show new equations fit using the Hanus et
+al. equation form and our data. The first shows predictions from an
+equation fit to predict height (which can be rearranged to predict DBH)
+and the second shows predictions from an equation fit to predict DBH
+given height. The axes on the first graph are somewhat unconventional in
+that the predicted value is still on the x axis so it matches the other
+graphs.
+
+![Field data and DBH predictions using an equation fit to predict
+height](extras/predictHt.png?raw=true)
+
+![Field data and DBH predictions using an equation fit to predict DBH
+directly](extras/predictDBH.png?raw=true)
+
 ## Field data
 
 The field data consists of a single excel spreadsheet with all of the
