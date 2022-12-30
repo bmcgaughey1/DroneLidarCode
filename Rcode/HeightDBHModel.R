@@ -1,7 +1,7 @@
 # exploring height-DBH relationship
 source("Rcode/predictDBH_Height.R")
 
-inputDataFile <- "Extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
+inputDataFile <- "extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
 
 # read data
 inputData <- read.csv(inputDataFile, stringsAsFactors = FALSE)

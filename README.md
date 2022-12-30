@@ -108,6 +108,15 @@ Hanus, et al. and FVS equations. I added over-arching functions that
 allow you to use both methods (methods = “hanus” or method = “fvs”). Use
 these functions instead of the original ones!!
 
+### [MergeAdjTrees.R](Rcode/MergeAdjTrees.R)
+
+Code to merge the adjusted tree locations produced by Bob and Ally. This
+code also filters out trees where the difference in location was more
+than one meter or the difference in tree height was more than one meter.
+The code produces some box plots that may be useful when explaining the
+adjustment process. This code is not particularly useful because the
+files with the adjusted locations are not included in this repository.
+
 ### [HeightDBHModel.R](Rcode/HeightDBHModel.R)
 
 Code the explores the height-DBH relationship using the field-measured
