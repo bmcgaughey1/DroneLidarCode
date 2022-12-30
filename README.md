@@ -134,10 +134,10 @@ heights](extras/DBH_Ht.png?raw=true)
 
 These next two graphs show new equations fit using the Hanus et
 al. equation form and our data. The first shows predictions from an
-equation fit to predict height (which can be rearranged to predict DBH)
-and the second shows predictions from an equation fit to predict DBH
-given height. The axes on the first graph are somewhat unconventional in
-that the predicted value is still on the x axis so it matches the other
+equation fit to predict height (which was rearranged to predict DBH) and
+the second shows predictions from an equation fit to predict DBH given
+height. The axes on the first graph are somewhat unconventional in that
+the predicted value is still on the x axis so it matches the other
 graphs.
 
 ![Field data and DBH predictions using an equation fit to predict
