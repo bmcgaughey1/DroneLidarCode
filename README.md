@@ -158,7 +158,7 @@ given the dense canopy conditions and steep slopes. Plots, except plot
 
 Individual tree locations were computing using the field-measured
 distance and azimuth from the plot reference point (usually a single
-tree dor each plot). Tree locations were adjusted manually using
+tree for each plot). Tree locations were adjusted manually using
 specially modified versions of FUSION and LDV. The adjustment
 capabilities included the ability to shift the entire plot as well as
 individual trees. In addition, tree tops can be moved while keeping the
@@ -168,11 +168,21 @@ trees.
 The following files are available:
 
 -   [Field plot locations](extras/plot_centers_UTM.zip)
+-   [Sample directory listing used as input for
+    Process2022Data.R](extras/dirlist.txt)
 -   [T3 treatment units](extras/Units_UTM10.zip)
 -   [Tree measurement data](extras/2021_T3_Upland_Trees.xlsx)
 -   [Lidar-derived metrics for upper 3m of individual tree crowns used
     to develop the RF classification
     model](extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv)
+
+The sample directory listing (dirlist.txt) file is meant to be an
+example. The folder names in the file match an external drive on my
+computer. While the data from Westfork was delivered using a subfolder
+arrangement, I put the zip files into the ONRC_DroneLidar folder on a
+drive labeled as drive D:. Look in Process2022Data.R for a DOS command
+to build the directory list (but note that you will hafe to edit the
+resulting file a bit to make it work with the R code).
 
 ## Installation
 

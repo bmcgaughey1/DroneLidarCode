@@ -81,14 +81,22 @@ to predict height (which was rearranged to predict DBH) and the second shows pre
 
 The field data consists of a single excel spreadsheet with all of the measured trees and a shapefile with the plot center locations. Locations were collected using a Javad Triumph 2 GNSS receiver and post processed using a nearby base station. With the receiver, we expect locations within 1-2m of the true location. However, larger errors are possible given the dense canopy conditions and steep slopes. Plots, except plot 6, are 1/4 acre with a radius of 17.68m. Plot 6 has a radius of 7.8m.
 
-Individual tree locations were computing using the field-measured distance and azimuth from the plot reference point (usually a single tree dor each plot). Tree locations were adjusted manually using specially modified versions of FUSION and LDV. The adjustment capabilities included the ability to shift the entire plot as well as individual trees. In addition, tree tops can be moved while keeping the tree base fixed to allow alignment with the point cloud for leaning trees.
+Individual tree locations were computing using the field-measured distance and azimuth from the plot reference point (usually a single tree for each plot). Tree locations were adjusted manually using specially modified versions of FUSION and LDV. The adjustment capabilities included the ability to shift the entire plot as well as individual trees. In addition, tree tops can be moved while keeping the tree base fixed to allow alignment with the point cloud for leaning trees.
 
 The following files are available:
 
   * [Field plot locations](extras/plot_centers_UTM.zip)
+  * [Sample directory listing used as input for Process2022Data.R](extras/dirlist.txt)
   * [T3 treatment units](extras/Units_UTM10.zip)
   * [Tree measurement data](extras/2021_T3_Upland_Trees.xlsx)
   * [Lidar-derived metrics for upper 3m of individual tree crowns used to develop the RF classification model](extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv)
+  
+The sample directory listing (dirlist.txt) file is meant to be an example. The
+folder names in the file match an external drive on my computer. While the data
+from Westfork was delivered using a subfolder arrangement, I put the zip files
+into the ONRC_DroneLidar folder on a drive labeled as drive D:. Look in
+Process2022Data.R for a DOS command to build the directory list (but note that
+you will hafe to edit the resulting file a bit to make it work with the R code).
   
 ## Installation
 
