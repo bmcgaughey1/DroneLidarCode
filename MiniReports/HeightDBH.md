@@ -35,6 +35,13 @@ also handle unit conversions more cleanly than the functions that work
 with the individual methods. The code for the prediction functions is in
 [predictDBH_Height.R](../Rcode/predictDBH_Height.R).
 
+This document is generated using RMarkdown. The source file is
+[HeightDBH.Rmd](../MiniReports/HeightDBH.Rmd). RMarkdown allows you to
+mix formatted text with R code. It provides a good way to document R
+code but an even better way to automate report generation that includes
+R code and inline R statements. The reports can include the R code and
+output or “hide” the R code and just present outputs.
+
 ## Load prediction code and field data
 
 We start by loading the code containing the prediction functions and our
