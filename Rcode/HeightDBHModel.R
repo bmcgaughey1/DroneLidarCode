@@ -37,7 +37,6 @@ legend(20, 70, c("Hanus PSME", "Hanus TSHE", "FVS PSME", "FVS TSHE"), pch = c(1,
 
 
 
-
 # fit new model for DF using Hanus equation form
 # DBH in cm and height in m
 

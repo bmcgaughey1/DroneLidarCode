@@ -108,6 +108,9 @@ Hanus, et al. and FVS equations. I added over-arching functions that
 allow you to use both methods (methods = “hanus” or method = “fvs”). Use
 these functions instead of the original ones!!
 
+For a more thorough discussion of the equations and equation fitting
+process refer to the [Height-DBH mini report](MiniReports/HeightDBH.md)
+
 ### [MergeAdjTrees.R](Rcode/MergeAdjTrees.R)
 
 Code to merge the adjusted tree locations produced by Bob and Ally. This
@@ -121,8 +124,8 @@ files with the adjusted locations are not included in this repository.
 
 Code the explores the height-DBH relationship using the field-measured
 DBH and lidar-derived height. The Hanus et al. and FVS methods vary
-somewhat but there isn’t really a clear choice for our data. I also fit
-new equations using the same form as Hanus et al. and our data. This new
+somewhat but there isn’t really a clear choice for our data. I fit new
+equations using the same form as Hanus et al. and our data. This new
 model is better. The Hanus et al. and FVS methods fit equations that
 predict height given DBH (since this is typically measured in the
 field). I also fit equations to directly predict DBH given our
@@ -135,25 +138,8 @@ wind river site). Given that we have field measurements of DBH nd
 lidar-derived heights, it makes sense to fit our own model and then use
 it to predict DBH from the lidar-derived heights.
 
-This graph shows the Hanus et al. and FVS predictions and how they
-relate to our data.
-
-![Predicted DBH values given our lidar-derived
-heights](extras/DBH_Ht.png?raw=true)
-
-These next two graphs show new equations fit using the Hanus et
-al. equation form and our data. The first shows predictions from an
-equation fit to predict height (which was rearranged to predict DBH) and
-the second shows predictions from an equation fit to predict DBH given
-height. The axes on the first graph are somewhat unconventional in that
-the predicted value is still on the x axis so it matches the other
-graphs.
-
-![Field data and DBH predictions using an equation fit to predict
-height](extras/PredictHt.png?raw=true)
-
-![Field data and DBH predictions using an equation fit to predict DBH
-directly](extras/PredictDBH.png?raw=true)
+For a more thorough discussion of the equations and equation fitting
+process refer to the [Height-DBH mini report](MiniReports/HeightDBH.md)
 
 ## Field data
 
