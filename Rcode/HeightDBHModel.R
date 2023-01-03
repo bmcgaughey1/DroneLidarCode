@@ -6,7 +6,7 @@ inputDataFile <- "extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
 # read data
 inputData <- read.csv(inputDataFile, stringsAsFactors = FALSE)
 
-# compute the avearge height using height measured by Ally and Bob in the point cloud
+# compute the average height using height measured by Ally and Bob in the point cloud
 inputData$aveHt <- (inputData$Total.Height.Ally + inputData$Total.Height.Bob) / 2
 
 # functions don't work with multiple trees (there are if statements that fail)
@@ -86,7 +86,7 @@ mean((log((WH$aveHt - 4.5) / exp(WHnls_coeff["a0"])) / WHnls_coeff["a1"])^(1 / W
 # simply solving for DBH in a height prediction equation doesn't necessarily give the "correct" DBH. In reality, it gives the
 # DBH that produces the desired height but the model was not fit to be used in that way. Not sure I can produce a good explanation
 # for this but it makes sense. The models fit directly for DBH have MUCH lower bias. Bias for height equation solved for DBH is
-# 0.66 and 2.07 cm for DF and WH. For the direct DBH equation, bias is -0.001 and -0.001 foe DF and WH.
+# 0.66 and 2.07 cm for DF and WH. For the direct DBH equation, bias is -0.001 and -0.001 for DF and WH.
 library(nls2)
 DFadd_nls <- nls(data = DF, DBH_cm ~ (log((aveHt - 4.5) / exp(a0)) / a1) ^ (1 / a2),
                  start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25))
