@@ -165,17 +165,17 @@ and the titles give the average error (bias).
 { # force all lines to execute as one...prevents splitting the code before and after the graphs
 par(mfrow=c(2,2))
 hist(DF$fvsDBH - DF$DBH_cm
-     , main = paste0("FVS DBH error -- DF (bias = ", round(mean(DF$fvsDBH - DF$DBH_cm), 2), ")")
-     , xlab = "DBH error")
+     , main = paste0("FVS DBH error -- DF (bias = ", round(mean(DF$fvsDBH - DF$DBH_cm), 2), " cm)")
+     , xlab = "DBH error (cm)")
 hist(DF$hanusDBH - DF$DBH_cm
-     , main = paste0("Hanus DBH error -- DF (bias = ", round(mean(DF$hanusDBH - DF$DBH_cm), 2), ")")
-     , xlab = "DBH error")
+     , main = paste0("Hanus DBH error -- DF (bias = ", round(mean(DF$hanusDBH - DF$DBH_cm), 2), " cm)")
+     , xlab = "DBH error (cm)")
 hist(WH$fvsDBH - WH$DBH_cm
-     , main = paste0("FVS DBH error -- WH (bias = ", round(mean(WH$fvsDBH - WH$DBH_cm), 2), ")")
-     , xlab = "DBH error")
+     , main = paste0("FVS DBH error -- WH (bias = ", round(mean(WH$fvsDBH - WH$DBH_cm), 2), " cm)")
+     , xlab = "DBH error (cm)")
 hist(WH$hanusDBH - WH$DBH_cm
-     , main = paste0("Hanus DBH error -- WH (bias = ", round(mean(WH$hanusDBH - WH$DBH_cm), 2), ")")
-     , xlab = "DBH error")
+     , main = paste0("Hanus DBH error -- WH (bias = ", round(mean(WH$hanusDBH - WH$DBH_cm), 2), " cm)")
+     , xlab = "DBH error (cm)")
 par(mfrow = c(1, 1))
 }
 ```
@@ -282,11 +282,11 @@ error (bias).
 { # force all lines to execute as one...prevents splitting the code before and after the graphs
 par(mfrow=c(1,2))
 hist(DF$predDBH - DF$DBH_cm
-     , main = paste0("DBH error -- DF (bias = ", round(mean(DF$predDBH - DF$DBH_cm), 2), ")")
-     , xlab = "DBH error")
+     , main = paste0("DBH error -- DF (bias = ", round(mean(DF$predDBH - DF$DBH_cm), 2), " cm)")
+     , xlab = "DBH error (cm)")
 hist(WH$predDBH - WH$DBH_cm
-     , main = paste0("DBH error -- WH (bias = ", round(mean(WH$predDBH - WH$DBH_cm), 2), ")")
-     , xlab = "DBH error")
+     , main = paste0("DBH error -- WH (bias = ", round(mean(WH$predDBH - WH$DBH_cm), 2), " cm)")
+     , xlab = "DBH error (cm)")
 par(mfrow = c(1, 1))
 }
 ```
