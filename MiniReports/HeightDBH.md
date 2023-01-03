@@ -32,4 +32,4 @@ equations along with a pair of functions that allow you to select the
 method (“hanus” or “fvs”). You should use this pair of functions as they
 also handle unit conversions more cleanly than the functions the work
 with the individual methods. The code for the prediction functions is in
-[predictDBH_Height.R](Rcode/predictDBH_Height.R).
+[predictDBH_Height.R](../Rcode/predictDBH_Height.R).
