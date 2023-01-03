@@ -292,7 +292,7 @@ Overall, fitting new equations using our field data and lidar-derived
 heights should give us a prediction model useful for the entire T3 study
 area. The Hanus et al. equations were fit to SMC data from British
 Columbia, western Washington, and northwestern Oregon. While all of
-these data are from the general region, it is well know that conditions
+these data are from the general region, it is well known that conditions
 on the Olympic Peninsula are different from “typical” westside forest
 conditions. The FVS equations were fit using thousands of tree
 measurements from FIA. The pacific coast variant includes multiple
