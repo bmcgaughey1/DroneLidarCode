@@ -18,6 +18,12 @@
 # tree top is different. Again, dense canopies can make it hard to line
 # things up. This is especially true when there are no stem hits to help
 # position the tree base.
+#
+# The first part of this code won't run anywhere except Bob's computer
+# because the individual plot files used for the adjustment of tree
+# locations are not included in the repository. The code starting in line
+# 100 will run. It reads a data file from the extras folder that is produced
+# by the first part of the code.
 # *****************************************************************************
 # *****************************************************************************
 plotNumbers <- c("07", "08", "09", "10", "13", "14",
@@ -70,13 +76,11 @@ plotTrees$diffTop <- sqrt(plotTrees$diffTopX ^ 2 + plotTrees$diffTopY ^ 2)
 # build a plot number
 plotTrees$PlotID <- as.factor(substr(plotTrees$Tree.ID, 1, 2))
 
-# drop all but trees with status code = 0
+# drop all but trees with status code = 0...these are the trees we adjusted
 plotTrees <- plotTrees[plotTrees$Status.Code.Ally == 0, ]
 plotTrees <- plotTrees[plotTrees$Status.Code.Bob == 0, ]
 
 # 624 trees that were relocated and matched
-boxplot(diff ~ PlotID, data = plotTrees, main = "Tree base location differences\nBob & Ally", xlab = "Plot number", ylab = "Horizontal difference (m)")
-boxplot(diffTop ~ PlotID, data = plotTrees, main = "Tree top location differences\nBob & Ally", xlab = "Plot number", ylab = "Horizontal difference (m)")
 
 # compare adjusted locations to original trees
 originalPlotTrees <- merge(plotTrees, originalTrees, by.x = "Tree.ID", by.y = "TreeID")
@@ -91,14 +95,40 @@ originalPlotTrees$origdiff.Bob <- sqrt(originalPlotTrees$origdiffX.Bob ^ 2 + ori
 
 originalPlotTrees$heightdiff <- abs(originalPlotTrees$Total.Height.Bob - originalPlotTrees$Total.Height.Ally)
 
+# write off data into the extras folder in the repository
+write.csv(originalPlotTrees, "extras/AdjustedTrees_AllPlots.csv", row.names = FALSE)
+
+# *****************************************************************************
+# *****************************************************************************
+# *****************************************************************************
+# *****************************************************************************
+# read data...start here if working with the data. Repository doesn't have the tree data adjusted by Ally & Bob in the form needed for the code above
+# 624 trees that were relocated and matched by Ally & Bob
+originalPlotTrees <- read.csv(file = "extras/AdjustedTrees_AllPlots.csv", stringsAsFactors = FALSE)
+
+# differences between tree base and top locations between Ally & Bob
+boxplot(diff ~ PlotID, data = originalPlotTrees, main = "Tree base location differences\nBob & Ally", xlab = "Plot number", ylab = "Horizontal difference (m)")
+boxplot(diffTop ~ PlotID, data = originalPlotTrees, main = "Tree top location differences\nBob & Ally", xlab = "Plot number", ylab = "Horizontal difference (m)")
+
+# summarize the differences in base and top locations
+hist(originalPlotTrees$diff)
+hist(originalPlotTrees$diffTop)
+
+# differences between the base and top locations between the original field locations and those adjusted by Ally & Bob
 boxplot(origdiff.Ally ~ PlotID, data = originalPlotTrees, main = "Tree base location differences\nAlly & Field", ylim = c(0, 8), xlab = "Plot number", ylab = "Horizontal difference (m)")
 boxplot(origdiff.Bob ~ PlotID, data = originalPlotTrees, main = "Tree base location differences\nBob & Field", ylim = c(0, 8), xlab = "Plot number", ylab = "Horizontal difference (m)")
 
+# height difference between Ally & Bob
 boxplot(heightdiff ~ PlotID, data = originalPlotTrees, main = "Tree height difference\nBob & Ally", ylim = c(0, 8), xlab = "Plot number", ylab = "Vertical difference (m)")
 
 # drop any trees where the base locations differ by more than 1m
 distThreshold <- 1
 trainingTrees <- originalPlotTrees[originalPlotTrees$diff <= distThreshold, ]
+
+#580 trees after filtering to remove trees with horizontal position differences > 1m
+
+# height differences between Ally & Bob for trees within 1m
+boxplot(heightdiff ~ PlotID, data = trainingTrees, main = "Tree height difference\nBob & Ally", ylim = c(0, 8), xlab = "Plot number", ylab = "Vertical difference (m)")
 
 # drop trees where we had a height difference of 1m or more
 heightThreshold <- 1
@@ -106,7 +136,7 @@ trainingTrees <- trainingTrees[trainingTrees$heightdiff <= heightThreshold, ]
 
 # 575 trees after filtering based on location and height difference thresholds
 
-# height difference between Bob & Ally
+# height difference between Bob & Ally for final trees
 boxplot(heightdiff ~ PlotID, data = trainingTrees, main = "Tree height difference (Bob - Ally)", ylim = c(0, 1.1), xlab = "Plot number", ylab = "Vertical difference (m)")
 
 # height difference by species
@@ -116,8 +146,8 @@ boxplot(heightdiff ~ PlotID, data = trainingTrees[trainingTrees$Species == "TSHE
 #boxplot(diff ~ PlotID, data = trainingTrees, main = "Tree base", ylim = c(0, 2))
 #boxplot(diffTop ~ PlotID, data = trainingTrees, main = "Tree top", ylim = c(0, 2))
 
-# write off the matched field trees to use for lidar matching. wed have reduced the set of field
-# trees to include only those where the locations that Ally and I adjusted were within 1m. Also
-# have heights within 1m
-outputFolder <- "G:/R_Stuff/ONRCDroneLidar"
+# write off the matched field trees to use for lidar matching. we have reduced the set of field
+# trees to include only those where the locations that Ally and I adjusted were within 1m and also
+# have heights within 1m.
+#outputFolder <- "G:/R_Stuff/ONRCDroneLidar"
 #write.csv(trainingTrees, paste0(outputFolder, "/TrainingTrees_Field_AllPlots.csv"), row.names = FALSE)
