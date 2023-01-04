@@ -199,7 +199,7 @@ legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("black",
 ```
 
 The resulting predictions seem to do better with our data. However, the predicted heights at the ends of the DBH distribution don't look great. Note
-that the graph above has the predicted height on the x axis. this is not conventional but makes comparison with other graphs easier.
+that the graph above has the predicted height on the x axis. This is not conventional but makes comparison with other graphs easier.
 
 Next I fit the same equation form rearranged to predict DBH given height:
 
