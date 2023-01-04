@@ -124,6 +124,9 @@ read in the data used for the rest of the code (the part that compares
 tree locations between the original field data and between the adjusted
 locations done by Ally & Bob).
 
+For a comparison of the adjustment process for Ally & Bob to the [Tree
+location mini report](MiniReports/TreeRelocation.md)
+
 ### [HeightDBHModel.R](Rcode/HeightDBHModel.R)
 
 Code the explores the height-DBH relationship using the field-measured

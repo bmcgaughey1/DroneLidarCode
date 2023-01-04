@@ -111,8 +111,8 @@ boxplot(diff ~ PlotID, data = originalPlotTrees, main = "Tree base location diff
 boxplot(diffTop ~ PlotID, data = originalPlotTrees, main = "Tree top location differences\nBob & Ally", xlab = "Plot number", ylab = "Horizontal difference (m)")
 
 # summarize the differences in base and top locations
-hist(originalPlotTrees$diff)
-hist(originalPlotTrees$diffTop)
+hist(originalPlotTrees$diff, main = "Tree base location difference (m)")
+hist(originalPlotTrees$diffTop, main = "Tree top location difference (m)")
 
 # differences between the base and top locations between the original field locations and those adjusted by Ally & Bob
 boxplot(origdiff.Ally ~ PlotID, data = originalPlotTrees, main = "Tree base location differences\nAlly & Field", ylim = c(0, 8), xlab = "Plot number", ylab = "Horizontal difference (m)")
