@@ -53,7 +53,7 @@ below.
 
 ### [Process2022Data.R](Rcode/Process2022Data.R)
 
-This code takes the drone lidar data flow in 2022 as input and produces
+This code takes the drone lidar data flown in 2022 as input and produces
 a set of outputs that includes the canopy height and surface models,
 individual tree related products (high point locations, crown perimeter
 polygons, point clips for each tree), and point clips for the upper 3m
