@@ -15,9 +15,21 @@ library(ggplot2)
 # that I get using the testing data. This only happens if I fit the RF model using the default for maxnodes.
 # If I set maxnodes = bestmtry - 1, I get behavior that makes sense.
 #
-#inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/T3_AdjXY_Training_TreeTops_AllPlots.csv"
-#inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
-inputDataFile <- "D:/Backup/R_Stuff/ONRCDroneLidar/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
+
+# set this flag variable if you want to use the metrics for the point clips for leaning trees that were
+# created using smaller point clips around the tree locations and also accounting for tree lean as
+# measured when Ally & Bob adjusted tree locations. Hopefully this set of metrics produces better
+# model performance.
+useLeaningTrees <- TRUE
+
+# read input file...format varies slighlty between the original file and the leaning tree file
+# testing: inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/T3_AdjXY_Training_TreeTops_AllPlots.csv"
+# testing: inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
+if (useLeaningTrees) {
+  inputDataFile <- "extras/Leaning_TreeTops_normalized_metrics.csv"
+} else {
+  inputDataFile <- "extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
+}
 
 # read data
 inputData <- read.csv(inputDataFile, stringsAsFactors = FALSE)
@@ -49,22 +61,39 @@ if (DropWindyPlots) {
   inputData <- dplyr::filter(inputData, Plot_Number != 18 & Plot_Number != 25 & Plot_Number != 27 & Plot_Number != 29 & Plot_Number != 34)
 }
 
-# extract useful columns...by number
-# 7 species
-# 44:48 metrics directly related to height...all clips should have heights from 0-3m so these metrics are OK to use for RF
-# 49 height CV
-# 50 height IQ distance
-# 51:80 height distribution metrics
-# 81:114 intensity metrics
-# 125:138 relative percentiles
-#modelData <- inputData[, c(7, 44:48, 49, 50, 51:80, 81:114, 125:138)]
-#modelData <- inputData[, c(8, 52:89, 90:123, 134:147)]
+# Sorting out column numbers can be a real pain. Easy way is to load the csv file into excel. Then copy the column labels (entire first row).
+# open a new spreadsheet (or tab in the current spreadsheet), put the cursor in row 1 column B and paste special...select transpose. Then
+# create sequential numbers in column A (put 1, 2, 3 in first three rows, select them and double click the small rectangle in the lower
+# right corner of the selection box).
 
-# this is all lidar metrics...89.0% accuracy
-modelData <- inputData[, c(49, 98:135, 136:169, 180:193)]
+if (useLeaningTrees) {
+  # extract useful columns...by number
+  # 48 species
+  # 91:128 metrics directly related to height...all clips should have heights from 0-3m so these metrics are OK to use for RF
+  # 129:161 intensity metrics
+  # 162 profile area
+  # 163:176 relative percentiles
 
-# this is only height related metrics...no intensity...84.5% accuracy
-#modelData <- inputData[, c(49, 98:135, 180:193)]
+  # this is all lidar metrics...89.0% accuracy
+  modelData <- inputData[, c(48, 91:128, 129:161, 162, 163:176)]
+} else {
+  # extract useful columns...by number
+  # 49 species
+  # 98:135 metrics directly related to height...all clips should have heights from 0-3m so these metrics are OK to use for RF
+  # 136:168 intensity metrics
+  # 169 profile area
+  # 180:193 relative percentiles
+
+  # this is all lidar metrics...89.0% accuracy
+  modelData <- inputData[, c(49, 98:135, 136:168, 169, 180:193)]
+}
+
+if (useLeaningTrees) {
+  #modelData <- inputData[, c(48, 91:128, 163:176)]
+} else {
+  # this is only height related metrics...no intensity...84.5% accuracy...for original tree metrics
+  #modelData <- inputData[, c(49, 98:135, 180:193)]
+}
 
 # filter out all species except PSME & TSHE...only 31 trees that could be matched to lidar trees
 modelData <- dplyr::filter(modelData, Species == "PSME" | Species == "TSHE")
@@ -113,7 +142,7 @@ table(modelData$Species)
 #
 # The more advanced tuning also takes much longer to run. In the initial testing, the improvement in model
 # performance wasn't that great.
-simpleTune <- FALSE
+simpleTune <- TRUE
 
 if (simpleTune) {
   # use a tuning function to find the best mtry value (lowest OOB error)
@@ -243,7 +272,11 @@ if (simpleTune) {
 }
 
 # save model for later use
-saveRDS(speciesRF, "FINAL_RF_HW_DF_Model.rds")
+if (useLeaningTrees) {
+  saveRDS(speciesRF, "FINAL_RF_HW_DF_Model_LeaningTrees.rds")
+} else {
+  saveRDS(speciesRF, "FINAL_RF_HW_DF_Model.rds")
+}
 speciesRF
 
 # compute accuracy for training data...should give same result as model summary but row/columns will be "correct"

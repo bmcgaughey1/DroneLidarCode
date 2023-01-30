@@ -66,6 +66,15 @@ takes several days to run on a moderately powerful laptop. When I
 processed the 2021 data, I was running on a desktop system with better
 performance. The 2021 data was smaller and processed in less than 1 day.
 
+### [ClipAdjTreeData.R](Rcode/ClipAdjTreeData.R)
+
+This code uses the adjusted tree locations and lean to clip points for
+individual trees using the 2021 drone lidar data. The goal for this is
+to compare the classification model performance using the tree clips
+from the automated segmentation using FUSION’s TreeSeg program with the
+performance using these new clips based on more precisely located trees
+and accounting for tree lean.
+
 ### [speciesModeling.R](Rcode/speciesModeling.R)
 
 This code uses the lidar-derived metrics (2021 lidar and 2021 plots) for
@@ -183,7 +192,7 @@ example. The folder names in the file match an external drive on my
 computer. While the data from Westfork was delivered using a subfolder
 arrangement, I put the zip files into the ONRC_DroneLidar folder on a
 drive labeled as drive D:. Look in Process2022Data.R for a DOS command
-to build the directory list (but note that you will hafe to edit the
+to build the directory list (but note that you will have to edit the
 resulting file a bit to make it work with the R code).
 
 ## Installation

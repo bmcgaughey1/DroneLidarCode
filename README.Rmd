@@ -38,6 +38,15 @@ All R code files are located in the Rcode folder. While I eventually want to mov
 
 This code takes the drone lidar data flown in 2022 as input and produces a set of outputs that includes the canopy height and surface models, individual tree related products (high point locations, crown perimeter polygons, point clips for each tree), and point clips for the upper 3m of the tree crowns used for species classification work using random forest. This code uses the [fusionwrapr](https://github.com/bmcgaughey1/fusionwrapr) package to interface with FUSION command line tools so you will need a full working installation of FUSION to use this code. For the 2022 data, this code takes several days to run on a moderately powerful laptop. When I processed the 2021 data, I was running on a desktop system with better performance. The 2021 data was smaller and processed in less than 1 day.
 
+### [ClipAdjTreeData.R](Rcode/ClipAdjTreeData.R)
+
+This code uses the adjusted tree locations and lean to clip points for
+individual trees using the 2021 drone lidar data. The goal for this is to
+compare the classification model performance using the tree clips from the
+automated segmentation using FUSION's TreeSeg program with the performance using
+these new clips based on more precisely located trees and accounting for tree
+lean.
+
 ### [speciesModeling.R](Rcode/speciesModeling.R)
 
 This code uses the lidar-derived metrics (2021 lidar and 2021 plots) for the upper 3m of the individual tree crowns (matched to field-measured trees) to build a classification model using random forest (RF) to distinguish Douglas-fir from western hemlock. In the code, there are some options for tuning the hyperparameters in random forest. The simple tuning only works on the mtry parameter. The other tuning deals with mtry, ntrees, and nodesize. Be warned that the more complex tuning takes MUCH longer to run. This files also has some code to produce plots of the most useful metrics, based on importance scores from RF, and to craete a list of point clips for misclassified individaul trees. This last product is useful for understanding what causes classification errors.
@@ -100,7 +109,7 @@ folder names in the file match an external drive on my computer. While the data
 from Westfork was delivered using a subfolder arrangement, I put the zip files
 into the ONRC_DroneLidar folder on a drive labeled as drive D:. Look in
 Process2022Data.R for a DOS command to build the directory list (but note that
-you will hafe to edit the resulting file a bit to make it work with the R code).
+you will have to edit the resulting file a bit to make it work with the R code).
   
 ## Installation
 
