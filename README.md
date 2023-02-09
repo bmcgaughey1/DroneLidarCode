@@ -66,6 +66,21 @@ takes several days to run on a moderately powerful laptop. When I
 processed the 2021 data, I was running on a desktop system with better
 performance. The 2021 data was smaller and processed in less than 1 day.
 
+### [Process2022Data_Spring.R](Rcode/Process2022Data_Spring.R)
+
+This code takes the drone lidar data flown in spring of 2022 as input
+and produces a set of outputs that includes the canopy height and
+surface models, individual tree related products (high point locations,
+crown perimeter polygons, point clips for each tree), and point clips
+for the upper 3m of the tree crowns used for species classification work
+using random forest. This code uses the
+[fusionwrapr](https://github.com/bmcgaughey1/fusionwrapr) package to
+interface with FUSION command line tools so you will need a full working
+installation of FUSION to use this code. For the spring 2022 data, this
+code takes several days to run on a moderately powerful laptop. When I
+processed the 2021 data, I was running on a desktop system with better
+performance. The 2021 data was smaller and processed in less than 1 day.
+
 ### [ClipAdjTreeData.R](Rcode/ClipAdjTreeData.R)
 
 This code uses the adjusted tree locations and lean to clip points for
@@ -74,6 +89,14 @@ to compare the classification model performance using the tree clips
 from the automated segmentation using FUSION’s TreeSeg program with the
 performance using these new clips based on more precisely located trees
 and accounting for tree lean.
+
+### [CoverageMap.R](Rcode/CoverageMap.R)
+
+This code creates a simple map showing the drone lidar coverage areas.
+The map is build using the tile index files so the boundaries of the
+AOIs are not exact. There are AOI files specific to each area but the
+file and folder naming conventions (or lack of) make working with the
+files difficult.
 
 ### [speciesModeling.R](Rcode/speciesModeling.R)
 
@@ -86,7 +109,7 @@ tuning only works on the mtry parameter. The other tuning deals with
 mtry, ntrees, and nodesize. Be warned that the more complex tuning takes
 MUCH longer to run. This files also has some code to produce plots of
 the most useful metrics, based on importance scores from RF, and to
-craete a list of point clips for misclassified individaul trees. This
+create a list of point clips for misclassified individual trees. This
 last product is useful for understanding what causes classification
 errors.
 
@@ -94,6 +117,17 @@ errors.
 
 This code creates an index of all of the drone data flown in 2022 by
 reading the extent of the individual point files. This code includes
+some functions that read LAS/LAZ file headers directly (byte values) and
+functions to build directory listings based on a wildcard specification,
+e.g. “\*.laz”. Output is a geopackage file and a shapefile with all tile
+extents. Some field names are truncated in the shapefile to comply with
+limitations of the shapefile format (and ESRI’s implementation of the
+format).
+
+### [IndexDroneLidar2022_Spring.R](Rcode/IndexDroneLidar2022_Spring.R)
+
+This code creates an index of all of the drone data flown in spring 2022
+by reading the extent of the individual point files. This code includes
 some functions that read LAS/LAZ file headers directly (byte values) and
 functions to build directory listings based on a wildcard specification,
 e.g. “\*.laz”. Output is a geopackage file and a shapefile with all tile
@@ -181,6 +215,8 @@ The following files are available:
 -   [Field plot locations](extras/plot_centers_UTM.zip)
 -   [Sample directory listing used as input for
     Process2022Data.R](extras/dirlist.txt)
+-   [Sample directory listing used as input for
+    Process2022Data_Spring.R](extras/dirlist_Spring.txt)
 -   [T3 treatment units](extras/Units_UTM10.zip)
 -   [Tree measurement data](extras/2021_T3_Upland_Trees.xlsx)
 -   [Lidar-derived metrics for upper 3m of individual tree crowns used

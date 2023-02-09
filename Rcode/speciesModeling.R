@@ -26,7 +26,7 @@ useLeaningTrees <- TRUE
 # testing: inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/T3_AdjXY_Training_TreeTops_AllPlots.csv"
 # testing: inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
 if (useLeaningTrees) {
-  inputDataFile <- "extras/Leaning_TreeTops_normalized_metrics.csv"
+  inputDataFile <- "extras/Leaning_TreeTops_SmallCylinder_normalized_metrics.csv"
 } else {
   inputDataFile <- "extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
 }
@@ -114,6 +114,11 @@ allData <- modelData
 # *****************************************************************************
 
 modelData <- allData
+
+if (useLeaningTrees) {
+  # drop rows with bad metrics
+  modelData <- modelData[modelData$Elev.stddev > 0, ]
+}
 
 # drop P95 and P99...testing RF behavior
 #modelData <- modelData[, -c(35,36)]

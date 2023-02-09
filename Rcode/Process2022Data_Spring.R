@@ -1,4 +1,4 @@
-# processing for 2022 drone lidar data
+# processing for spring 2022 drone lidar data
 
 library(fusionwrapr)
 library(sf)
@@ -23,7 +23,7 @@ renameCheck <- function(from = "", to = "") {
 prjFile <- "D:/T3_DroneLidar/UTM10.prj"
 
 # read in the list of project folders
-dirList <- "D:/ONRC_DroneLidar/dirlist.txt"
+dirList <- "D:/2022SpringData/dirlist_Spring.txt"
 dirs <- read.csv2(dirList, header = FALSE)
 
 # fix backslashes
@@ -34,7 +34,7 @@ dirs <- lapply(dirs[,1], function(x) {gsub("\\\\", "/", x)})
 # processing. It makes it a little easier to see if things worked by simply looking for files in each folder.
 for (i in 1:length(dirs)) {
 #for (i in 1:2) {
-  verifyFolder(paste0(dirs[i], "/DSM"))
+  #verifyFolder(paste0(dirs[i], "/DSM"))
   verifyFolder(paste0(dirs[i], "/ground"))
   verifyFolder(paste0(dirs[i], "/LAS"))
   verifyFolder(paste0(dirs[i], "/Processing/CHM"))
@@ -82,7 +82,7 @@ for (i in 1:length(dirs)) {
 #
 # this loop should start at 1 unless processing was interrupted by a reboot.
 
-for (i in 1:length(dirs)) {
+for (i in 44:length(dirs)) {
 #for (i in 1:1) {
   # set up folder info
   dataFolder <- dirs[i]

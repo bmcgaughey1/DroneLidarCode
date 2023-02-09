@@ -233,8 +233,6 @@ for (plot in 1:nrow(folders)) {
     tic(paste0("Computing metrics for plot ", folders$Plot_Number[plot]))
   pointFolder <- folders$Folder[plot]
 
-  # ***** add new clipping to smaller cylinder to (hopefully) remove points from adjacent trees
-
   # create output folder for new tree clips
   outFile <- paste0(pointFolder, "Processing/AdjustedTrees/metrics.csv")
 
@@ -299,6 +297,93 @@ for (plot in 1:nrow(folders)) {
 
 # write off combined file
 write.csv(allMerged, paste0("D:/T3_DroneLidar", "/Leaning_TreeTops_normalized_metrics.csv"), row.names = FALSE)
+
+
+
+# work through the folders, clip smaller cylinder for the tree and compute metrics
+
+sampleRadius <- 1
+topDepth <- 3
+
+#for (plot in 1:2) {
+for (plot in 1:nrow(folders)) {
+  tic(paste0("Computing metrics for plot ", folders$Plot_Number[plot]))
+  pointFolder <- folders$Folder[plot]
+
+  # create output folder for new tree clips
+  outFile <- paste0(pointFolder, "Processing/AdjustedTrees/metrics.csv")
+
+  CloudMetrics(paste0(pointFolder, "Processing/AdjustedTrees/", "Plot_", folders$Plot_Number[plot], "*.las")
+               , outFile
+               , new = TRUE
+               , rid = TRUE
+  )
+
+  # read the metrics to get the high point
+  # read the metrics for the non-normalized points and get the highest elevation
+  m <- read.csv(outFile, stringsAsFactors = FALSE)
+
+  # compute the elevation for the base of the upper portion
+  m$SampleBaseElev <- m$Elev.maximum - topDepth
+
+  # build commands to clip to upper portion of each TAO
+  for (i in 1:nrow(m)) {
+    ClipData(m$DataFile[i]
+             , paste0(pointFolder, "Processing/AdjustedTrees/TreeTops_SmallCylinder/", m$FileTitle[i], ".las")
+             , zmin = m$SampleBaseElev[i]
+             , zmax = m$Elev.maximum[i]
+             , minx = allTrees$aveTopX[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] - sampleRadius
+             , miny = allTrees$aveTopY[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] - sampleRadius
+             , maxx = allTrees$aveTopX[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] + sampleRadius
+             , maxy = allTrees$aveTopY[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] + sampleRadius
+             , shape = 1
+    )
+  }
+
+  # use the lower elevation value to normalize the upper crown points using ClipData and the /biaselev:minelevation option
+  # bias is added to point height so it needs to be negative
+  # zmin and zmax are evaluated after bias adjustment so zmin=0 and zmax=topDepth
+  for (i in 1:nrow(m)) {
+    ClipData(m$DataFile[i]
+             , paste0(pointFolder, "Processing/AdjustedTrees/TreeTops_SmallCylinder_normalized/", m$FileTitle[i], ".las")
+             , zmin = 0
+             , zmax = topDepth
+             , biaselev = -m$SampleBaseElev[i]
+             , minx = allTrees$aveTopX[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] - sampleRadius
+             , miny = allTrees$aveTopY[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] - sampleRadius
+             , maxx = allTrees$aveTopX[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] + sampleRadius
+             , maxy = allTrees$aveTopY[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] + sampleRadius
+             , shape = 1
+    )
+  }
+
+  # compute metrics for tree tops...use rid=TRUE to parse tree number from end of point file name
+  CloudMetrics(paste0(pointFolder, "Processing/AdjustedTrees/TreeTops_SmallCylinder_normalized/", "Plot_", folders$Plot_Number[plot], "*.las")
+               , paste0(pointFolder, "Processing/AdjustedTrees/TreeTops_SmallCylinder_normalized", "/TreeTops_SmallCylinder_normalized_metrics.csv")
+               , new = TRUE
+               , rid = TRUE
+  )
+
+  m <- read.csv(paste0(pointFolder, "Processing/AdjustedTrees/TreeTops_SmallCylinder_normalized", "/TreeTops_SmallCylinder_normalized_metrics.csv"), stringsAsFactors = FALSE)
+  m$Plot_Number <- folders$Plot_Number[plot]
+
+  # merge metrics and field data
+  merged <- merge(allTrees, m, by.x = c("Plot_Number", "Tag_Num"), by.y = c("Plot_Number", "Identifier"))
+
+  write.csv(merged, paste0(pointFolder, "Processing/AdjustedTrees/TreeTops_SmallCylinder_normalized",
+                           "/Leaning_TreeTops_SmallCylinder_normalized_metrics_Plot",
+                           sprintf("%02i", folders$Plot_Number[plot]), ".csv"), row.names = FALSE)
+
+  if (plot == 1) {
+    allMerged <- merged
+  }
+  else {
+    allMerged <- rbind(allMerged, merged)
+  }
+}
+
+# write off combined file
+write.csv(allMerged, paste0("D:/T3_DroneLidar", "/Leaning_TreeTops_SmallCylinder_normalized_metrics.csv"), row.names = FALSE)
 
 
 

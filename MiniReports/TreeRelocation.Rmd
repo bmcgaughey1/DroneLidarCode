@@ -149,8 +149,8 @@ boxplot(heightdiff ~ PlotID, data = trainingTrees
 ```
 
 Given that we are using the upper crown morphology to distinguish Douglas-fir from western hemlock, I thought there might be some
-relationship between species and the height error. The following plots show the errors by species. It doens't look like there is any
-reltionship between the height differences and species.
+relationship between species and the height error. The following plots show the errors by species. It doesn't look like there is any
+relationship between the height differences and species.
 
 ```{r}
 {
