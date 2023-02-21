@@ -1,0 +1,50 @@
+---
+title: "UAS lidar pulse density West Fork Kalaloch"
+output: pdf_document
+date: "2023-02-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(terra)
+
+# pulse density rasters for each flight line
+line1 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line1_pulsedensity.asc")
+line2 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line2_pulsedensity.asc")
+line3 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line3_pulsedensity.asc")
+line4 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line4_pulsedensity.asc")
+line5 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line5_pulsedensity.asc")
+line6 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line6_pulsedensity.asc")
+line7 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line7_pulsedensity.asc")
+line8 <- rast("D:/ONRC_DroneLidar/Riparian/Riparian Finals/T3 Riparian Reach 3_West Fork Kalaloch/line8_pulsedensity.asc")
+
+line1Density <- line1 / 4
+line2Density <- line2 / 4
+line3Density <- line3 / 4
+line4Density <- line4 / 4
+line5Density <- line5 / 4
+line6Density <- line6 / 4
+line7Density <- line7 / 4
+line8Density <- line8 / 4
+
+#par(mfrow=c(2,4))
+plot(line1Density, plg = list(title = "Line 1"))
+plot(line2Density, plg = list(title = "Line 2"))
+plot(line3Density, plg = list(title = "Line 3"))
+plot(line4Density, plg = list(title = "Line 4"))
+plot(line5Density, plg = list(title = "Line 5"))
+plot(line6Density, plg = list(title = "Line 6"))
+plot(line7Density, plg = list(title = "Line 7"))
+plot(line8Density, plg = list(title = "Line 8"))
+#par(mfrow=c(1,1))
+```
+

@@ -184,6 +184,8 @@ par(mfrow = c(1, 1))
 
 ## Fit new equations
 
+### Predict height given DBH
+
 Given that we have field-measured DBH and lidar-derived height values
 for several hundred trees, it makes sense to try fitting our own
 equations to predict DBH given height. First, I tried fitting an
@@ -230,8 +232,22 @@ legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("black",
 
 The resulting predictions seem to do better with our data. However, the
 predicted heights at the ends of the DBH distribution don’t look great.
-Note that the graph above has the predicted height on the x axis. this
+Note that the graph above has the predicted height on the x axis. This
 is not conventional but makes comparison with other graphs easier.
+
+The equation to predict height in meters given DBH in cm is of the form:
+
+> Height(m) = 1.37 + exp(a<sub>0</sub> +
+> a<sub>1</sub>(DBH(cm)<sup>a<sub>2</sub></sup>))
+
+Coefficients for DF and WH are provided in the following table.
+
+| Species | a<sub>0</sub> | a<sub>1</sub> | a<sub>2</sub> |
+|---------|---------------|---------------|---------------|
+| DF      | 5.0199        | -4.7311       | -0.2982       |
+| WH      | 3.758         | -22.9194      | -1.1665       |
+
+### Predict DBH given height
 
 Next I fit the same equation form rearranged to predict DBH given
 height:

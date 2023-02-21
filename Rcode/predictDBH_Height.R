@@ -10,36 +10,55 @@
 # *****Functions have requirements for units for both DBH and height mentioned in the comments. The Hanus
 # *****functions have a conversion factor for the input measurement but output will always be in meters.
 # *****The FVS function must have DBH in inches and height in feet.
+# *****The customT3 functions must have DBH in cm and height in meters.
 
 # *****I added the over-arching functions to predict DBH and height to clean up the unit problems. The original
 # *****functions still exist and they have weird units. Use the over-arching functions!!
 
-# method can be "hanus" or "fvs"
+# method can be "hanus" or "fvs" or "customT3"
 # heightUnits can be "meters" or "feet"
 # DBHUnits can be "cm" or "inches"
 # location is specific to FVS...refer to the FVS variant documentation for valid values
 
+# for the "customT3" method, only PSME and TSHE are available
+
 # over-arching function to predict DBH
 predictDBH <- function(spp, height, method = "hanus", heightUnits = "feet", DBHUnits = "inches", location = 1) {
-  # both methods expect height in feet...convert if heightunits = "meters"
+  # "fvs" and "hanus" methods expect height in feet...convert if heightUnits = "meters"
+  # "customT3" method expects height in meters...convert it heightUnits = "feet"
   theHeight <- height
-  if (tolower(heightUnits) == "meters")
-    theHeight <- height * 3.2808
+  if (tolower(method) == "fvs" || tolower(method) == "hanus") {
+    if (tolower(heightUnits) == "meters")
+      theHeight <- height * 3.2808
+  }
+  else {
+    if (tolower(heightUnits) == "feet")
+      theHeight <- height / 3.2808
+  }
 
-  # if using FVS, check for species code
+  # check for species code and call method-specific function
   if (tolower(method) == "fvs") {
     if (spp == "ALRU") spp <- "ALRU2"
     if (spp == "PIMO") spp <- "PIMO3"
 
     theDBH <- predictFVS(spp, height = theHeight, mode = 1, location = location)
   }
-  else {
+  else if (tolower(method) == "hanus") {
     theDBH <- predictDBHHanus(spp, theHeight, conversionFactor = 1.0) / 2.54
+  }
+  else {
+    theDBH <- predictDBHCustomT3(spp, theHeight, conversionFactor = 1.0)
   }
 
   # deal with DBH units
-  if (tolower(DBHUnits) == "cm") {
-    theDBH <- theDBH * 2.54
+  if (tolower(method) == "fvs" || tolower(method) == "hanus") {
+    if (tolower(DBHUnits) == "cm") {
+      theDBH <- theDBH * 2.54
+    }
+  }
+  else {
+    if (tolower(DBHUnits) == "inches")
+      theDBH <- theDBH / 2.54
   }
 
   return(invisible(theDBH))
@@ -47,10 +66,17 @@ predictDBH <- function(spp, height, method = "hanus", heightUnits = "feet", DBHU
 
 # over-arching function to predict height
 predictHeight <- function(spp, dbh, method = "hanus", heightUnits = "feet", DBHUnits = "inches", location = 1) {
-  # both methods expect DBH in inches...convert if DBHUnits = "cm"
+  # "fvs" and "hanus" methods expect DBH in inches...convert if DBHUnits = "cm"
+  # "customT3" method expects DBH in cm...convert it DBHUnits = "inches"
   theDBH <- dbh
-  if (tolower(DBHUnits) == "cm")
-    theDBH <- dbh / 2.54
+  if (tolower(method) == "fvs" || tolower(method) == "hanus") {
+    if (tolower(DBHUnits) == "cm")
+      theDBH <- dbh / 2.54
+  }
+  else {
+    if (tolower(DBHUnits) == "inches")
+      theDBH <- dbh * 2.54
+  }
 
   # if using FVS, check for species code
   if (tolower(method) == "fvs") {
@@ -59,13 +85,23 @@ predictHeight <- function(spp, dbh, method = "hanus", heightUnits = "feet", DBHU
 
     theHeight <- predictFVS(spp, dbh = theDBH, mode = 0, location = location)
   }
-  else {
+  else if (tolower(method) == "hanus") {
     theHeight <- predictHeightHanus(spp, theDBH, conversionFactor = 1.0) * 3.2808
+  }
+  else {
+    theHeight <- predictHeightCustomT3(spp, theDBH, conversionFactor = 1.0)
   }
 
   # deal with DBH units
-  if (tolower(heightUnits) == "meters") {
-    theHeight <- theHeight / 3.2808
+  if (tolower(method) == "fvs" || tolower(method) == "hanus") {
+    if (tolower(heightUnits) == "meters") {
+      theHeight <- theHeight / 3.2808
+    }
+  }
+  else {
+    if (tolower(heightUnits) == "feet") {
+      theHeight <- theHeight * 3.2808
+    }
   }
 
   return(invisible(theHeight))
@@ -117,6 +153,60 @@ predictDBHHanus <- function(spp, height, conversionFactor = 3.2808) {
   DBH <- (log((height*conversionFactor - 4.5) / exp(a0[sppIndex])) / a1[sppIndex])^(1 / a2[sppIndex])
 
   return(DBH * 2.54)
+}
+
+# function to predict height (m) given a DBH (cm)
+# this model las fit using DBH in cm and height in meters
+# DBH can be in inches with conversionFactor = 2.54 but height will still be returned in meters
+#
+# for our T3 equations, equations were fit directly to predict height given DBH and to predict DBH given height
+# this means starting with a DBH, predicting a height and then using the predicted height to get a predicted DBH
+# will not necessarily give the original DBH
+predictHeightCustomT3 <- function(spp, DBH, conversionFactor = 1.0) {
+  # Ht = 4.5 + exp(a0 + a1 * DBH^a2)
+  # DBH = (ln((Ht - 4.5) / exp(a0)) / a1)^(1 / a2)
+  # Ht is in feet and DBH is in inches...hence the need for the conversion factor
+  species <- c("PSME", "TSHE")
+  a0 <- c(5.0199, 3.758)
+  a1 <- c(-4.7311, -22.9194)
+  a2 <- c(-0.2982, -1.1665)
+
+  # match spp
+  sppIndex <- which(species == spp)
+
+  if (length(sppIndex) == 0) {
+    message("Invalid species: ", spp, "...must be one of: ", paste(species, collapse = ","), "...assuming PSME")
+    sppIndex <- 1
+  }
+
+  Ht = 1.37 + exp(a0[sppIndex] + a1[sppIndex] * (DBH * conversionFactor)^(a2[sppIndex]))
+
+  return(Ht)
+}
+
+# function to predict DBH (cm) given a height (m)
+# this model las fit using DBH in cm and height in meters
+# height can be in feet with conversionFactor = 3.2808 but DBH will still be returned in cm
+predictDBHCustomT3 <- function(spp, height, conversionFactor = 1.0) {
+  # Ht = 4.5 + exp(a0 + a1 * DBH^a2)
+  # DBH = (ln((Ht - 4.5) / exp(a0)) / a1)^(1 / a2)
+  # Ht is in feet and DBH is in inches...hence the need for the conversion factor
+  species <- c("PSME", "TSHE")
+  a0 <- c(10.7258, 3.9072)
+  a1 <- c(-11.0555, -752.7518)
+  a2 <- c(-0.1118, -2.0014)
+
+  # match spp
+  sppIndex <- which(species == spp)
+
+  if (length(sppIndex) == 0) {
+    message("Invalid species: ", spp, "...must be one of: ", paste(species, collapse = ","), "...assuming PSME")
+    sppIndex <- 1
+  }
+
+  DBH <- (log((height / conversionFactor - 1.37) / exp(a0[sppIndex])) / a1[sppIndex])^(1 / a2[sppIndex])
+
+  return(DBH)
 }
 
 # function to implement height/dbh prediction logic from Pacific Coast variant of FVS

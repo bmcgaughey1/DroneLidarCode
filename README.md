@@ -98,6 +98,17 @@ AOIs are not exact. There are AOI files specific to each area but the
 file and folder naming conventions (or lack of) make working with the
 files difficult.
 
+### [PulseDensityPlots.Rmd](Rcode/PulseDensityPlots.Rmd)
+
+This code looks at pulse density (first return density) by flightline
+for one of the riparian areas (Reach 3 West Fork Kalaloch). In some work
+getting ready for a presentation, I noticed that it looked like the
+flightlines parallel to the stream had higher density. As it turns out,
+I was just picking locations with hihger density. The plots show that
+the density is pretty much the same overall between strips. However,
+there are variations within the strip tht Chris thinks are due to the
+aircraft climbing or descending and thus moving faster and slower.
+
 ### [speciesModeling.R](Rcode/speciesModeling.R)
 
 This code uses the lidar-derived metrics (2021 lidar and 2021 plots) for
@@ -222,6 +233,9 @@ The following files are available:
 -   [Lidar-derived metrics for upper 3m of individual tree crowns used
     to develop the RF classification
     model](extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv)
+-   [Adjusted tree locations from Ally and Bob merged with field data.
+    Also includes some derived information for each
+    tree](extras/AdjustedTrees_AllPlots.csv)
 
 The sample directory listing (dirlist.txt) file is meant to be an
 example. The folder names in the file match an external drive on my

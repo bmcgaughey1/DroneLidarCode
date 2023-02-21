@@ -13,7 +13,8 @@ knitr::opts_chunk$set(
 
 # Predicting DBH using lidar-derived heights
 
-This report explores the relationship between DBH and height in our field data. Initially, we used the equations from
+This report explores the relationship between DBH and height in our 2021 field data for Douglas-fir and western hemlock.
+Initially, we used equations from
 
 > Hanus, M.L., D.D. Marshall, and D.W. Hann. 1999. Height-diameter equations for six species in the coastal regions 
 of the Pacific Northwest.  Forestry Research Laboratory, contribution 25.  11 p.
@@ -28,13 +29,16 @@ give DBH or height but the equations and coefficients are the same. Basically, a
 DBH and height (not sure which was used for fitting but I suspect the equation was fit to predict height given DBH) and then rearranged
 to solve for the "other" variable.
 
-I developed R functions to do the predictions using both sets of equations along with a pair of functions that allow you to select the method ("hanus"
-or "fvs"). You should use this pair of functions as they also handle unit conversions more cleanly than the functions that work with the individual
-methods. The code for the prediction functions is in [predictDBH_Height.R](../Rcode/predictDBH_Height.R).
+I developed R functions to do the predictions using both sets of equations along with a pair of functions that allow you to select the method ("hanus",
+"fvs", or "customT3"). You should use this pair of functions as they also handle unit conversions more cleanly than the functions that work with
+the individual methods. The code for the prediction functions is in [predictDBH_Height.R](../Rcode/predictDBH_Height.R).
 
 This document is generated using RMarkdown. The source file is [HeightDBH.Rmd](../MiniReports/HeightDBH.Rmd). RMarkdown allows you to mix formatted 
 text with R code. It provides a good way to document R code but an even better way to automate report generation that includes R code and inline 
-R statements. The reports can include the R code and output or "hide" the R code and just present outputs.
+R statements. The reports can include the R code and output or "hide" the R code and just present outputs. For me, RMarkdown seems to work best
+when I pretty much know what I am doing or where an analysis is going. For exploratory work where I start with RMarkdown, I usually end up regretting
+the choice since the code is more awkward to run. You can just highlight lines and run them but if you run a block of code using the buttons
+in the editor, output gets a little weird.
 
 ## Load prediction code and field data
 
@@ -160,6 +164,8 @@ par(mfrow = c(1, 1))
 
 ## Fit new equations
 
+### Predict height given DBH
+
 Given that we have field-measured DBH and lidar-derived height values for several hundred trees, it makes sense to try fitting our own equations
 to predict DBH given height. First, I tried fitting an equation that predicts height given DBH (this is the same approach used by both FVS and
 Hanus et al.). I used the same equation form as that used by Hanus et al. but used height in meters and DBH in cm:
@@ -200,6 +206,19 @@ legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("black",
 
 The resulting predictions seem to do better with our data. However, the predicted heights at the ends of the DBH distribution don't look great. Note
 that the graph above has the predicted height on the x axis. This is not conventional but makes comparison with other graphs easier.
+
+The equation to predict height in meters given DBH in cm is of the form:
+
+> Height(m) = 1.37 + exp(a~0~ + a~1~(DBH(cm)^a~2~^))
+
+Coefficients for DF and WH are provided in the following table.
+
+Species | a~0~ | a~1~ | a~2~
+------- | ---- | ---- | ----
+DF      | `r round(DFnls_coeff["a0"], 4)` | `r round(DFnls_coeff["a1"], 4)` | `r round(DFnls_coeff["a2"], 4)`
+WH      | `r round(WHnls_coeff["a0"], 4)` | `r round(WHnls_coeff["a1"], 4)` | `r round(WHnls_coeff["a2"], 4)`
+
+### Predict DBH given height
 
 Next I fit the same equation form rearranged to predict DBH given height:
 

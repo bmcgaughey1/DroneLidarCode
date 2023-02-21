@@ -55,7 +55,10 @@ horizontal location so the geometric primitive representing the tree
 crown better encompassed the crown.
 
 The data for the adjusted locations is in
-[AdjustedTrees_AllPlots.csv](../extras/AdjustedTrees_AllPlots.csv).
+[AdjustedTrees_AllPlots.csv](../extras/AdjustedTrees_AllPlots.csv). This
+file also has the field data and some derived information for each tree
+(canopy base height). This file does not have the point cloud metrics
+for the trees.
 
 ``` r
 originalPlotTrees <- read.csv(file = "../extras/AdjustedTrees_AllPlots.csv", stringsAsFactors = FALSE)
