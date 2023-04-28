@@ -138,6 +138,16 @@ table(trainingData$Species)
 table(testingData$Species)
 table(modelData$Species)
 
+modelData %>%
+  group_by(Species) %>%
+  summarize(
+    Count = n(),
+    AveP99 = mean(Elev.P99, na.rm = TRUE),
+    IntP80 = mean(Int.P80, na.rm = TRUE),
+    IntP20 = mean(Int.P20, na.rm = TRUE),
+    IntIQ = mean(Int.IQ, na.rm = TRUE)
+  )
+
 # flag for model tuning. If TRUE, only mtry is tuned. Otherwise, more parameters are tuned
 # using caret procedures from https://stackoverflow.com/questions/57939453/building-a-randomforest-with-caret
 #
@@ -323,7 +333,7 @@ plot(modelData$Elev.P99, modelData$Elev.P99, col = modelData$Species)
 plot(modelData$Elev.P99, modelData$Elev.P95, col = modelData$Species)
 plot(modelData$Elev.P99, modelData$Elev.stddev, col = modelData$Species)
 
-ggplot(modelData, aes(x = Species, y = Elev.P99)) + geom_boxplot()
+ggplot(modelData, aes(x = Species, y = Elev.P99)) + geom_boxplot() + theme(axis.text=element_text(size=12, face="bold"), axis.title=element_text(size=14,face="bold"))
 ggplot(modelData, aes(x = Species, y = Elev.P95)) + geom_boxplot()
 ggplot(modelData, aes(x = Species, y = Int.L.skewness)) + geom_boxplot()
 

@@ -20,10 +20,10 @@ renameCheck <- function(from = "", to = "") {
 # one DSM file name in riparian files (reach 2) was missing "m" in 0.5m tif image
 
 # projection for for UTM10...this is used for several outputs
-prjFile <- "D:/T3_DroneLidar/UTM10.prj"
+prjFile <- "E:/T3_DroneLidar/UTM10.prj"
 
 # read in the list of project folders
-dirList <- "D:/2022SpringData/dirlist_Spring.txt"
+dirList <- "E:/Spring2022_DroneLidar/dirlist_Spring.txt"
 dirs <- read.csv2(dirList, header = FALSE)
 
 # fix backslashes
@@ -34,7 +34,7 @@ dirs <- lapply(dirs[,1], function(x) {gsub("\\\\", "/", x)})
 # processing. It makes it a little easier to see if things worked by simply looking for files in each folder.
 for (i in 1:length(dirs)) {
 #for (i in 1:2) {
-  #verifyFolder(paste0(dirs[i], "/DSM"))
+  verifyFolder(paste0(dirs[i], "/DSM"))
   verifyFolder(paste0(dirs[i], "/ground"))
   verifyFolder(paste0(dirs[i], "/LAS"))
   verifyFolder(paste0(dirs[i], "/Processing/CHM"))
@@ -82,7 +82,14 @@ for (i in 1:length(dirs)) {
 #
 # this loop should start at 1 unless processing was interrupted by a reboot.
 
-for (i in 44:length(dirs)) {
+# area 21 is failing...not sure why: E:/Spring2022_DroneLidar/T3 Riparian Finals/T3 Riparian Reach 8_South Fork Manor
+# area 24 is failing...not sure why: E:/Spring2022_DroneLidar/VDT Finals/Bz AVDT
+# area 25 is failing...not sure why: E:/Spring2022_DroneLidar/VDT Finals/Cp AVDT
+# area 26 is failing...not sure why: E:/Spring2022_DroneLidar/VDT Finals/Cz AVDT
+# also E:/Spring2022_DroneLidar/Willamette LTEP/Willamette_LTEP_Plot-10
+# stopped processing after last failure
+# looks to be dying while writing DoProcessing2.bat
+for (i in 27:length(dirs)) {
 #for (i in 1:1) {
   # set up folder info
   dataFolder <- dirs[i]

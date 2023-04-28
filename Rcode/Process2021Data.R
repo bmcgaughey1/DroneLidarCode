@@ -1,4 +1,5 @@
-# processing for 2022 drone lidar data
+# processing for 2021 drone lidar data
+# these data have a different folder structure than the data from 2022
 
 library(fusionwrapr)
 library(sf)
@@ -23,7 +24,7 @@ renameCheck <- function(from = "", to = "") {
 prjFile <- "E:/T3_DroneLidar/UTM10.prj"
 
 # read in the list of project folders
-dirList <- "E:/2022_DroneLidar/dirlist.txt"
+dirList <- "E:/T3_DroneLidar/dirlist.txt"
 dirs <- read.csv2(dirList, header = FALSE)
 
 # fix backslashes
@@ -46,33 +47,38 @@ for (i in 1:length(dirs)) {
   verifyFolder(paste0(dirs[i], "/Processing/Trees/TAOpts_normalized"))
 
   # move DSM files...not all projects have 0.5m DSMs
-  renameCheck(paste0(dirs[i], "/DSM_.5m.laz"), paste0(dirs[i], "/DSM/DSM_.5m.laz"))
-  renameCheck(paste0(dirs[i], "/DSM_.5m.tif"), paste0(dirs[i], "/DSM/DSM_.5m.tif"))
-  renameCheck(paste0(dirs[i], "/DSM_1m.laz"), paste0(dirs[i], "/DSM/DSM_1m.laz"))
-  renameCheck(paste0(dirs[i], "/DSM_1m.tif"), paste0(dirs[i], "/DSM/DSM_1m.tif"))
+  # renameCheck(paste0(dirs[i], "/DSM_.5m.laz"), paste0(dirs[i], "/DSM/DSM_.5m.laz"))
+  # renameCheck(paste0(dirs[i], "/DSM_.5m.tif"), paste0(dirs[i], "/DSM/DSM_.5m.tif"))
+  # renameCheck(paste0(dirs[i], "/DSM_1m.laz"), paste0(dirs[i], "/DSM/DSM_1m.laz"))
+  # renameCheck(paste0(dirs[i], "/DSM_1m.tif"), paste0(dirs[i], "/DSM/DSM_1m.tif"))
+
+  # move ground file
+  renameCheck(paste0(dirs[i], "/DTM/ground.dtm"), paste0(dirs[i], "/ground/ground.dtm"))
 
   # move ground files
-  renameCheck(paste0(dirs[i], "/DTM_1m.laz"), paste0(dirs[i], "/ground/DTM_1m.laz"))
-  renameCheck(paste0(dirs[i], "/DTM_1m.tif"), paste0(dirs[i], "/ground/DTM_1m.tif"))
+  # renameCheck(paste0(dirs[i], "/DTM_1m.laz"), paste0(dirs[i], "/ground/DTM_1m.laz"))
+  # renameCheck(paste0(dirs[i], "/DTM_1m.tif"), paste0(dirs[i], "/ground/DTM_1m.tif"))
 
   # move contour shapefiles and KML file...uses a rename command to "move" the files
-  t <- basename(Sys.glob(paste0(dirs[i], "/*Contour.*")))
-  for (j in 1:length(t)) {
-    renameCheck(paste0(dirs[i], "/", t[j]), paste0(dirs[i], "/ground/", t[j]))
-  }
+  # t <- basename(Sys.glob(paste0(dirs[i], "/*Contour.*")))
+  # for (j in 1:length(t)) {
+  #   renameCheck(paste0(dirs[i], "/", t[j]), paste0(dirs[i], "/ground/", t[j]))
+  # }
 }
 
 # convert DTM to PLANS format needed for FUSION
 for (i in 1:length(dirs)) {
 #for (i in 1:2) {
-  r <- raster(paste0(dirs[i], "/ground/DTM_1m.tif"))
-  writeDTM(r, paste0(dirs[i], "/ground/ground.dtm"),
-           xyunits = "M",
-           zunits = "M",
-           coordsys = 1,
-           zone = 10,
-           horizdatum = 2,
-           vertdatum = 2)
+  if (file.exists(paste0(dirs[i], "/DTM/DTM_1m.tif"))) {
+    r <- raster(paste0(dirs[i], "/DTM/DTM_1m.tif"))
+    writeDTM(r, paste0(dirs[i], "/ground/ground.dtm"),
+             xyunits = "M",
+             zunits = "M",
+             coordsys = 1,
+             zone = 10,
+             horizdatum = 2,
+             vertdatum = 2)
+  }
 }
 
 # we should have clean data ready for further processing...
@@ -81,9 +87,8 @@ for (i in 1:length(dirs)) {
 # just a few modifications.
 #
 # this loop should start at 1 unless processing was interrupted by a reboot.
-
-for (i in 1:length(dirs)) {
-#for (i in 1:1) {
+#for (i in 1:length(dirs)) {
+for (i in 1:4) {
   # set up folder info
   dataFolder <- dirs[i]
   groundFileSpec <- paste0(dirs[i], "/ground/ground.dtm")

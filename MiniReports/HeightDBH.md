@@ -3,8 +3,9 @@
 
 # Predicting DBH using lidar-derived heights
 
-This report explores the relationship between DBH and height in our
-field data. Initially, we used the equations from
+This report explores the relationship between DBH and height in our 2021
+field data for Douglas-fir and western hemlock. Initially, we used
+equations from
 
 > Hanus, M.L., D.D. Marshall, and D.W. Hann. 1999. Height-diameter
 > equations for six species in the coastal regions of the Pacific
@@ -30,17 +31,31 @@ solve for the “other” variable.
 
 I developed R functions to do the predictions using both sets of
 equations along with a pair of functions that allow you to select the
-method (“hanus” or “fvs”). You should use this pair of functions as they
-also handle unit conversions more cleanly than the functions that work
-with the individual methods. The code for the prediction functions is in
+method (“hanus”, “fvs”, or “customT3”). You should use this pair of
+functions as they also handle unit conversions more cleanly than the
+functions that work with the individual methods. The code for the
+prediction functions is in
 [predictDBH_Height.R](../Rcode/predictDBH_Height.R).
+
+<span style="color:red">**IMPORTANT NOTE: When trying to use the new
+equations to predict DBH for TSHE using lidar-derived heights for TAOs,
+I discovered that the model is predicting extremely large DBH values for
+reasonable heights. The problems start just outside the range of our
+field data and result in values of NaN for heights above \~51 meters. I
+think it best to avoid using the new customT3 equations until I can sort
+out the problems.**</span>
 
 This document is generated using RMarkdown. The source file is
 [HeightDBH.Rmd](../MiniReports/HeightDBH.Rmd). RMarkdown allows you to
 mix formatted text with R code. It provides a good way to document R
 code but an even better way to automate report generation that includes
 R code and inline R statements. The reports can include the R code and
-output or “hide” the R code and just present outputs.
+output or “hide” the R code and just present outputs. For me, RMarkdown
+seems to work best when I pretty much know what I am doing or where an
+analysis is going. For exploratory work where I start with RMarkdown, I
+usually end up regretting the choice since the code is more awkward to
+run. You can just highlight lines and run them but if you run a block of
+code using the buttons in the editor, output gets a little weird.
 
 ## Load prediction code and field data
 
@@ -252,7 +267,7 @@ Coefficients for DF and WH are provided in the following table.
 Next I fit the same equation form rearranged to predict DBH given
 height:
 
-> DBH(cm) = log((Height(m) - 1.37) / exp(a<sub>0</sub>)) /
+> DBH(cm) = (log((Height(m) - 1.37) / exp(a<sub>0</sub>)) /
 > a<sub>1</sub>)<sup>(1/a<sub>2</sub>)</sup>
 
 These results do better at the ends of the DBH distribution and appear
@@ -326,7 +341,7 @@ than we see in our data.
 
 The final equation to predict DBH directly is of the form:
 
-> DBH(cm) = log((Height(m) - 1.37) / exp(a<sub>0</sub>)) /
+> DBH(cm) = (log((Height(m) - 1.37) / exp(a<sub>0</sub>)) /
 > a<sub>1</sub>)<sup>(1/a<sub>2</sub>)</sup>
 
 Coefficients for DF and WH are provided in the following table.

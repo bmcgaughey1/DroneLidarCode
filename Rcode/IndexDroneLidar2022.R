@@ -302,8 +302,8 @@ DirListByName <- function (
 # *****************************************************************************
 # *****************************************************************************
 # *****************************************************************************
-# read list of data foldes
-dirList <- "D:/ONRC_DroneLidar/dirlist.txt"
+# read list of data folders
+dirList <- "E:/2022_DroneLidar/dirlist.txt"
 folders <- read.csv2(dirList, header = FALSE)
 
 # fix backslashes
@@ -314,12 +314,26 @@ LASfiles <- Sys.glob(file.path(folders, "*.laz"))
 
 # create an index using the footprints for all LAZ files
 # uses functions from BuildR6ServerIndex.R
-BuildIndexFromPoints("", "", "", "D:/ONRC_DroneLidar/DroneIndex2022.gpkg", projString = 26910, fullFileList = LASfiles, rebuild = TRUE)
+BuildIndexFromPoints("", "", "", "E:/2022_DroneLidar/DroneIndex2022.gpkg", projString = 26910, fullFileList = LASfiles, rebuild = TRUE)
 
 # read and display along with units
-index <- st_read("D:/ONRC_DroneLidar/DroneIndex2022.gpkg")
-units <- st_read("D:/T3_GIS/Final_layout/Units_UTM10.shp")
-mapview(list(index, units))
+index <- st_read("E:/2022_DroneLidar/DroneIndex2022.gpkg")
+#units <- st_read("D:/T3_GIS/Final_layout/Units_UTM10.shp")
+
+# code to help match drone lidar plot IDs with LTEP IDs...did this manually using the map display
+units <- st_read("E:/2022_DroneLidar/Sappho LTEP/AOIs Flight Lines/Sappho_plots.shp")
+
+# treeFiles <- Sys.glob("E:/Backup/R_Stuff/RAClassification/Georeferenced_tree_plots_2020_sampling/*_Trees_Project.shp")
+#
+# trees <- list()
+# for (i in 1:length(treeFiles)) {
+#   trees[[i]] <- st_read(treeFiles[i])
+# }
+
+trees <- st_read("E:/Backup/R_Stuff/RAClassification/AllPlots_Trees.gpkg")
+
+mapview(list(index, units)) + mapview(trees)
+mapview(list(index))
 
 # write shapefile...field names are changed to make Arc happy
-st_write(index, "D:/ONRC_DroneLidar/DroneIndex2022.shp")
+st_write(index, "E:/2022_DroneLidar/DroneIndex2022.shp")
