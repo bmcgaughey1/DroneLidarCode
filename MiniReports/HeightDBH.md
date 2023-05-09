@@ -42,8 +42,14 @@ equations to predict DBH for TSHE using lidar-derived heights for TAOs,
 I discovered that the model is predicting extremely large DBH values for
 reasonable heights. The problems start just outside the range of our
 field data and result in values of NaN for heights above \~51 meters. I
-think it best to avoid using the new customT3 equations until I can sort
-out the problems.**</span>
+refit the models after adding an artificial data point to pin down the
+left end of the model using DBH = 5 cm and height = 5 m. In addition, I
+used regression weights computed as 1/DBH for the height model and
+1/height for the DBH model. The weight for the artificial points was set
+to a large value to “force” the equation to go through the point. This
+seems to have fixed the problems with the models. However, the resulting
+models are nearly straight line functions so I probably could have used
+linear least squares methods to fit the models.**</span>
 
 This document is generated using RMarkdown. The source file is
 [HeightDBH.Rmd](../MiniReports/HeightDBH.Rmd). RMarkdown allows you to
@@ -144,13 +150,13 @@ et al. equations produce DBH values that are smaller for a given height
 and seem to fit our data better than the FVS equations.
 
 ``` r
-plot(DF$aveHt, DF$DBH_cm
+plot(WH$aveHt, WH$DBH_cm
      , col = "red", pch = 1
      , ylab = "Predicted DBH (cm)"
      , xlab = "Lidar height (m)"
      , main = "Comparing field and predicted DBH & lidar height")
 points(WH$aveHt, WH$DBH_cm, col = "red", pch = 16)
-legend(36, 25, c("Field PSME", "Field TSHE")
+legend(35.5, 32, c("Field PSME", "Field TSHE")
        , pch = c(1, 16)
        , col = c("red", "red"))
 
@@ -164,7 +170,7 @@ points(DF$aveHt, DF$hanusDBH
 points(WH$aveHt, WH$hanusDBH
        , col = "blue", pch = 16)
 
-legend(20, 70, c("Hanus PSME", "Hanus TSHE", "FVS PSME", "FVS TSHE")
+legend(20, 66, c("Hanus PSME", "Hanus TSHE", "FVS PSME", "FVS TSHE")
        , pch = c(1, 16, 1, 16)
        , col = c("blue", "blue", "green", "green"))
 ```
@@ -197,23 +203,129 @@ par(mfrow = c(1, 1))
 
 ![](HeightDBH_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
+## Look at a wider range in height values
+
+When using my custom equations to predict DBH given lidar-derived
+heights, I noticed that DBH values were too large. The following graph
+shows the behavior of the FVS and Hanus model for larger height values.
+
+``` r
+# generate a range of heights
+hts <- seq(5, 75, by = 2)
+
+# predict DBH
+PSMEfvsDBH <- c()
+PSMEhanusDBH <- c()
+PSMEcustomDBH <- c()
+TSHEfvsDBH <- c()
+TSHEhanusDBH <- c()
+TSHEcustomDBH <- c()
+for (i in 1:length(hts)) {
+  PSMEfvsDBH[i] <- predictDBH("PSME"
+                          , hts[i]
+                          , method = "fvs"
+                          , location = 1
+                          , heightUnits = "meters"
+                          , DBHUnits = "cm")
+  TSHEfvsDBH[i] <- predictDBH("TSHE"
+                            , hts[i]
+                            , method = "fvs"
+                            , location = 1
+                            , heightUnits = "meters"
+                            , DBHUnits = "cm")
+  
+  PSMEhanusDBH[i] <- predictDBH("PSME"
+                          , hts[i]
+                          , method = "hanus"
+                          , location = 1
+                          , heightUnits = "meters"
+                          , DBHUnits = "cm")
+  TSHEhanusDBH[i] <- predictDBH("TSHE"
+                            , hts[i]
+                            , method = "hanus"
+                            , location = 1
+                            , heightUnits = "meters"
+                            , DBHUnits = "cm")
+
+  PSMEcustomDBH[i] <- predictDBH("PSME"
+                          , hts[i]
+                          , method = "custom"
+                          , location = 1
+                          , heightUnits = "meters"
+                          , DBHUnits = "cm")
+  TSHEcustomDBH[i] <- predictDBH("TSHE"
+                            , hts[i]
+                            , method = "custom"
+                            , location = 1
+                            , heightUnits = "meters"
+                            , DBHUnits = "cm")
+}
+
+# plot
+plot(hts, PSMEfvsDBH
+     , col = "red", pch = 1
+     , ylab = "Predicted DBH--FVS (cm)"
+     , xlab = "Lidar height (m)"
+     , main = "Predicted DBH -- FVS")
+points(hts, TSHEfvsDBH, col = "red", pch = 16)
+legend(65, 80, c("PSME", "TSHE")
+       , pch = c(1, 16)
+       , col = c("red", "red"))
+```
+
+![](HeightDBH_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+
+plot(hts, PSMEhanusDBH
+     , col = "red", pch = 1
+     , ylab = "Predicted DBH--Hanus (cm)"
+     , xlab = "Lidar height (m)"
+     , main = "Predicted DBH -- Hanus")
+points(hts, TSHEhanusDBH, col = "red", pch = 16)
+legend(65, 80, c("PSME", "TSHE")
+       , pch = c(1, 16)
+       , col = c("red", "red"))
+```
+
+![](HeightDBH_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+
+plot(hts, PSMEcustomDBH
+     , col = "red", pch = 1
+     , ylab = "Predicted DBH--custom (cm)"
+     , xlab = "Lidar height (m)"
+     , main = "Predicted DBH -- custom")
+points(hts, TSHEcustomDBH, col = "red", pch = 16)
+legend(65, 80, c("PSME", "TSHE")
+       , pch = c(1, 16)
+       , col = c("red", "red"))
+```
+
+![](HeightDBH_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+
 ## Fit new equations
 
 ### Predict height given DBH
 
 Given that we have field-measured DBH and lidar-derived height values
 for several hundred trees, it makes sense to try fitting our own
-equations to predict DBH given height. First, I tried fitting an
-equation that predicts height given DBH (this is the same approach used
-by both FVS and Hanus et al.). I used the same equation form as that
-used by Hanus et al. but used height in meters and DBH in cm:
+equations to predict DBH given height. However, doing this produced an
+equation for TSHE that behaved erratically outside the range of our
+field data giving large height and DBH values.
+
+First, I tried fitting an equation that predicts height given DBH (this
+is the same approach used by both FVS and Hanus et al.). I used the same
+equation form as that used by Hanus et al. but used height in meters and
+DBH in cm:
 
 > Height(m) = 1.37 + exp(a<sub>0</sub> +
 > a<sub>1</sub>(DBH(cm)<sup>a<sub>2</sub></sup>))
 
 ``` r
-DFadd_nls <- nls(data = DF, aveHt ~ 1.37 + exp(a0 + a1 * DBH_cm ^ a2),
-                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25))
+DFadd_nls <- nls(data = DF, aveHt ~ 1.37 + exp(a0 + a1 * (DBH_cm ^ a2)),
+                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25), weights = 1 / DF$DBH_cm)
 DFnls_coeff <- coef(DFadd_nls)
 
 plot(DF$aveHt, DF$DBH_cm, col = "red", pch = 1, ylab = "Field DBH (cm)", xlab = "Predicted height (m)", main = "Predicted height given field DBH")
@@ -228,8 +340,8 @@ points(DF$aveHt, DF$predHt, col = "black", pch = 1)
 
 # fit new model for WH using Hanus equation form
 # DBH in cm and height in m
-WHadd_nls <- nls(data = WH, aveHt ~ 1.37 + exp(a0 + a1 * DBH_cm ^ a2),
-                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25))
+WHadd_nls <- nls(data = WH, aveHt ~ 1.37 + exp(a0 + a1 * (DBH_cm ^ a2)),
+                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25), weights = 1 / WH$DBH_cm)
 WHnls_coeff <- coef(WHadd_nls)
 
 # predict heights
@@ -243,12 +355,83 @@ points(WH$aveHt, WH$predHt, col = "black", pch = 16)
 legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("black", "black"))
 ```
 
-![](HeightDBH_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](HeightDBH_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+Note that the graph above has the predicted height on the x axis. This
+is not conventional but makes comparison with other graphs easier.
 
 The resulting predictions seem to do better with our data. However, the
 predicted heights at the ends of the DBH distribution don’t look great.
-Note that the graph above has the predicted height on the x axis. This
-is not conventional but makes comparison with other graphs easier.
+In particular, the equation for WH exhibits extreme asymptotic behavior
+at the upper end leading to large predicted heights for DBH values
+outside the range of our data.
+
+I “fixed” this by adding an artificial data point with DBH = 5 cm and
+height = 5 m and gave this point an extremely large weight (relative to
+the weight computed as 1/DBH). This effectively forces the fitted line
+to go through the (5, 5) point. I tried other DBH/height combinations
+and the actual values didn’t really matter all that much. The average
+predicted DBH for the FVS and Hanus equations given a height of 5 m is
+around 5.4 cm so 5 cm seemed reasonable. I did not try forcing a point
+at the upper end of the DBH range to see how this affected the model.
+
+``` r
+d <- DF
+w <- 1 / DF$aveHt
+
+# add (0,0) with a high weight
+d[nrow(d) + 1,] <- d[nrow(d),]
+d$aveHt[nrow(d)] <- 5
+d$DBH_cm[nrow(d)] <- 5
+
+w[length(w) + 1] <- 1000
+
+DFadd_nls <- nls(data = d, aveHt ~ 1.37 + exp(a0 + a1 * (DBH_cm ^ a2)),
+                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25), weights = w)
+DFnls_coeff <- coef(DFadd_nls)
+
+plot(DF$aveHt, DF$DBH_cm, col = "red", pch = 1, ylab = "Field DBH (cm)", xlab = "Predicted height (m)", main = "Predicted height given field DBH")
+points(WH$aveHt, WH$DBH_cm, col = "red", pch = 16)
+legend(38, 27, c("Field PSME", "Field TSHE"), pch = c(1, 16), col = c("red", "red"))
+
+# predict heights
+d$predHt <- (log((d$aveHt - 1.37) / exp(DFnls_coeff["a0"])) / DFnls_coeff["a1"])^(1 / DFnls_coeff["a2"])
+                                                                                   
+# plot predicted DBH using lidar height
+points(d$aveHt, d$predHt, col = "black", pch = 1)
+
+# fit new model for WH using Hanus equation form
+# DBH in cm and height in m
+d <- WH
+w <- 1 / WH$aveHt
+
+# add (0,0) with a high weight
+d[nrow(d) + 1,] <- d[nrow(d),]
+d$aveHt[nrow(d)] <- 5
+d$DBH_cm[nrow(d)] <- 5
+
+w[length(w) + 1] <- 1000
+
+WHadd_nls <- nls(data = d, aveHt ~ 1.37 + exp(a0 + a1 * (DBH_cm ^ a2)),
+                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25), weights = w)
+WHnls_coeff <- coef(WHadd_nls)
+
+# predict heights
+d$predHt <- (log((d$aveHt - 1.37) / exp(WHnls_coeff["a0"])) / WHnls_coeff["a1"])^(1 / WHnls_coeff["a2"])
+
+points(d$aveHt, d$predHt, col = "black", pch = 16)
+
+# plot predicted height using field DBH
+#points(4.5 + exp(WHnls_coeff[1] + WHnls_coeff[2] * WH$DBH_cm ^ WHnls_coeff[3]), WH$DBH_cm, col = "magenta", pch = 16)
+
+legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("black", "black"))
+```
+
+![](HeightDBH_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+I still suspect that the WH equation is a little wonky as you apply it
+to larger DBH values but this isn’t the equation we really want to use
+so I a ignoring the potential problem for now.
 
 The equation to predict height in meters given DBH in cm is of the form:
 
@@ -259,8 +442,8 @@ Coefficients for DF and WH are provided in the following table.
 
 | Species | a<sub>0</sub> | a<sub>1</sub> | a<sub>2</sub> |
 |---------|---------------|---------------|---------------|
-| DF      | 5.0199        | -4.7311       | -0.2982       |
-| WH      | 3.758         | -22.9194      | -1.1665       |
+| DF      | 4.1641        | -8.3715       | -0.6641       |
+| WH      | 3.9013        | -9.9524       | -0.8311       |
 
 ### Predict DBH given height
 
@@ -278,8 +461,20 @@ library(nls2)
 #> Warning: package 'nls2' was built under R version 4.2.2
 #> Loading required package: proto
 #> Warning: package 'proto' was built under R version 4.2.2
-DFadd_nls <- nls(data = DF, DBH_cm ~ (log((aveHt - 1.37) / exp(a0)) / a1) ^ (1 / a2),
-                 start = list(a0 = 7.0, a1 = -6.0, a2 = -0.25))
+
+# build data and weights for fitting...start with field observations
+d <- DF
+w <- 1 / DF$aveHt
+
+# add (0,0) with a high weight
+d[nrow(d) + 1,] <- d[nrow(d),]
+d$aveHt[nrow(d)] <- 5
+d$DBH_cm[nrow(d)] <- 5
+
+w[length(w) + 1] <- 1000
+
+DFadd_nls <- nls(data = d, DBH_cm ~ (log((aveHt - 1.37) / exp(a0)) / a1) ^ (1 / a2),
+                 start = list(a0 = 8.0, a1 = -8.0, a2 = -0.2), weights = w)
 DFnls_coeff <- coef(DFadd_nls)
 
 plot(DF$aveHt, DF$DBH_cm, col = "red", pch = 1, ylab = "Predicted DBH (cm)", xlab = "Lidar height (m)", main = "Predicted DBH given lidar height")
@@ -287,23 +482,33 @@ points(WH$aveHt, WH$DBH_cm, col = "red", pch = 16)
 legend(38, 27, c("Field PSME", "Field TSHE"), pch = c(1, 16), col = c("red", "red"))
 
 DF$predDBH <- (log((DF$aveHt - 1.37) / exp(DFnls_coeff["a0"])) / DFnls_coeff["a1"])^(1 / DFnls_coeff["a2"])
-points(DF$aveHt, DF$predDBH, col = "orange", pch = 1)
+points(DF$aveHt, DF$predDBH, col = "blue", pch = 1)
 
 # plot predicted height using field DBH
 #points(4.5 + exp(DFnls_coeff[1] + DFnls_coeff[2] * DF$DBH_cm ^ DFnls_coeff[3]), DF$DBH_cm, col = "magenta", pch = 1)
 
-WHadd_nls <- nls(data = WH, DBH_cm ~ (log((aveHt - 1.37) / exp(a0)) / a1) ^ (1 / a2),
-                 start = list(a0 = 4, a1 = -28, a2 = -1))
+d <- WH
+w <- 1 / WH$aveHt
+
+# add (0,0) with a high weight
+d[nrow(d) + 1,] <- d[nrow(d),]
+d$aveHt[nrow(d)] <- 5
+d$DBH_cm[nrow(d)] <- 5
+
+w[length(w) + 1] <- 1000
+
+WHadd_nls <- nls(data = d, DBH_cm ~ (log((aveHt - 1.37) / exp(a0)) / a1) ^ (1 / a2),
+                 start = list(a0 = 8.0, a1 = -8.0, a2 = -0.2), weights = w)
 WHnls_coeff <- coef(WHadd_nls)
 
 WH$predDBH <- (log((WH$aveHt - 1.37) / exp(WHnls_coeff["a0"])) / WHnls_coeff["a1"])^(1 / WHnls_coeff["a2"])
 
-points(WH$aveHt, WH$predDBH, col = "orange", pch = 16)
+points(WH$aveHt, WH$predDBH, col = "blue", pch = 16)
 
-legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("orange", "orange"))
+legend(38, 36, c("Custom PSME", "Custom TSHE"), pch = c(1, 16), col = c("blue", "blue"))
 ```
 
-![](HeightDBH_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](HeightDBH_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 These histograms show the distribution of prediction errors for the new
 equation that predicts DBH directly and the titles give the average
@@ -322,7 +527,7 @@ par(mfrow = c(1, 1))
 }
 ```
 
-![](HeightDBH_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](HeightDBH_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## Summary
 
@@ -348,5 +553,5 @@ Coefficients for DF and WH are provided in the following table.
 
 | Species | a<sub>0</sub> | a<sub>1</sub> | a<sub>2</sub> |
 |---------|---------------|---------------|---------------|
-| DF      | 10.7258       | -11.0555      | -0.1118       |
-| WH      | 3.9072        | -752.7518     | -2.0014       |
+| DF      | 7.618         | -8.6751       | -0.1959       |
+| WH      | 29.7387       | -30.2213      | -0.0375       |

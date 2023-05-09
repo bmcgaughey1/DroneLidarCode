@@ -167,9 +167,15 @@ predictHeightCustomT3 <- function(spp, DBH, conversionFactor = 1.0) {
   # DBH = (ln((Ht - 4.5) / exp(a0)) / a1)^(1 / a2)
   # Ht is in feet and DBH is in inches...hence the need for the conversion factor
   species <- c("PSME", "TSHE")
-  a0 <- c(5.0199, 3.758)
-  a1 <- c(-4.7311, -22.9194)
-  a2 <- c(-0.2982, -1.1665)
+  a0 <- c(4.1641, 3.9013)
+  a1 <- c(-8.3715, -9.9524)
+  a2 <- c(-0.6641, -0.8311)
+
+  # these are the original coefficients before I used weighted nls() regression and added the artificial data point with
+  # DBH = 5 cm and height = 5 m.
+  # a0 <- c(5.0199, 3.758)
+  # a1 <- c(-4.7311, -22.9194)
+  # a2 <- c(-0.2982, -1.1665)
 
   # match spp
   sppIndex <- which(species == spp)
@@ -192,9 +198,15 @@ predictDBHCustomT3 <- function(spp, height, conversionFactor = 1.0) {
   # DBH = (ln((Ht - 4.5) / exp(a0)) / a1)^(1 / a2)
   # Ht is in feet and DBH is in inches...hence the need for the conversion factor
   species <- c("PSME", "TSHE")
-  a0 <- c(10.7258, 3.9072)
-  a1 <- c(-11.0555, -752.7518)
-  a2 <- c(-0.1118, -2.0014)
+  a0 <- c(7.618, 29.7387)
+  a1 <- c(-8.6751, -30.2213)
+  a2 <- c(-0.1959, -0.0375)
+
+  # these are the original coefficients before I used weighted nls() regression and added the artificial data point with
+  # DBH = 5 cm and height = 5 m.
+  # a0 <- c(10.7258, 3.9072)
+  # a1 <- c(-11.0555, -752.7518)
+  # a2 <- c(-0.1118, -2.0014)
 
   # match spp
   sppIndex <- which(species == spp)
