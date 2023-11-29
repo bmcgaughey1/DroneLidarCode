@@ -33,7 +33,7 @@ plotNumbers <- c("07", "08", "09", "10", "13", "14",
                  "42", "43", "46", "47")
 
 # Bob's trees
-outputFolder <- "E:/Backup/R_Stuff/ONRCDroneLidar/AllyPlots"
+outputFolder <- "G:/R_Stuff/ONRCDroneLidar/AllyPlots"
 adjustedTreesBob <- read.csv(file = paste0(outputFolder, "/WORKING_FUSIONtrees.csv"), stringsAsFactors = FALSE)
 originalTrees <- read.csv(file = paste0(outputFolder, "/FieldTrees.csv"), stringsAsFactors = FALSE)
 
@@ -96,7 +96,7 @@ originalPlotTrees$origdiff.Bob <- sqrt(originalPlotTrees$origdiffX.Bob ^ 2 + ori
 originalPlotTrees$heightdiff <- abs(originalPlotTrees$Total.Height.Bob - originalPlotTrees$Total.Height.Ally)
 
 # write off data into the extras folder in the repository
-write.csv(originalPlotTrees, "extras/AdjustedTrees_AllPlots.csv", row.names = FALSE)
+#write.csv(originalPlotTrees, "extras/AdjustedTrees_AllPlots.csv", row.names = FALSE)
 
 # *****************************************************************************
 # *****************************************************************************

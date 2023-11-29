@@ -1,6 +1,12 @@
 # code to create new tree locations based on the adjustments done by Ally and Bob
 # Goal is to extract new points for these new locations and compare classification
 # results to those obtained using the original segmented trees.
+#
+# 10/18/2023 Realized that all of the output from this code was lost when my external drive
+# failed so I needed to rerun. Folder names had to be changed since they were slightly different
+# in the new copy of the data. Keven and I used different strategies when renaming folders. Keven
+# cleaned up folder names to remove spaces, I did not. Unfortunately, reclipping using the leaning
+# trees is not a fast process!!
 library(lidR)
 library(tictoc)
 library(fusionwrapr)
@@ -24,15 +30,19 @@ cross3d_prod <- function(v1,v2){
 # this file has all of the field trees that were adjusted by Ally and Bob. Not
 # all of these were successfully matched to a lidar-segmented tree so there are more trees
 # here that the file that has lidar metrics used to copy the segmented trees later in this code.
-allTrees <- read.csv(file = "extras/AdjustedTrees_AllPlots.csv", stringsAsFactors = FALSE)
+allTreesOriginal <- read.csv(file = "extras/AdjustedTrees_AllPlots.csv", stringsAsFactors = FALSE)
 
 # drop any trees where the base locations differ by more than 1m
 distThreshold <- 1
-allTrees <- allTrees[allTrees$diff <= distThreshold, ]
+allTrees <- allTreesOriginal[allTreesOriginal$diff <= distThreshold, ]
 
 # drop trees where we had a height difference of 1m or more
 heightThreshold <- 1
 allTrees <- allTrees[allTrees$heightdiff <= heightThreshold, ]
+
+# 624 original trees that were adjusted
+# 580 trees with adjusted base locations within 1m
+# 575 trees with adjusted base locations within 1m and heights within 1m
 
 # compute averages
 allTrees$aveBaseX <- (allTrees$X.Ally + allTrees$X.Bob) / 2
@@ -54,33 +64,33 @@ allTrees$aveCrownDia <- (allTrees$Max.Crown.Diameter.Ally + allTrees$Max.Crown.D
 # build a list of folders for plots...hand coded :-(
 folders <- data.frame(Plot_Number = unique(allTrees$Plot_Number), Folder = "")
 folders$Folder <- c(
-  "D:/T3_DroneLidar/Ba/Plot 7/"
-  , "D:/T3_DroneLidar/Ba/Plots 8,9,36,46/"
-  , "D:/T3_DroneLidar/Ba/Plots 8,9,36,46/"
-  , "D:/T3_DroneLidar/Ba/Plots 10,47/"
-  , "D:/T3_DroneLidar/Az/Plots 13,14,23,24,43/"
-  , "D:/T3_DroneLidar/Az/Plots 13,14,23,24,43/"
-  , "D:/T3_DroneLidar/Aa/Plots 16,31/"
-  , "D:/T3_DroneLidar/Aa/Plots 17,18,26,27/"
-  , "D:/T3_DroneLidar/Aa/Plots 17,18,26,27/"
-  , "D:/T3_DroneLidar/Da/Plots 20,21,22/"
-  , "D:/T3_DroneLidar/Da/Plots 20,21,22/"
-  , "D:/T3_DroneLidar/Da/Plots 20,21,22/"
-  , "D:/T3_DroneLidar/Az/Plots 13,14,23,24,43/"
-  , "D:/T3_DroneLidar/Az/Plots 13,14,23,24,43/"
-  , "D:/T3_DroneLidar/Dz/Plots 25,42/"
-  , "D:/T3_DroneLidar/Aa/Plots 17,18,26,27/"
-  , "D:/T3_DroneLidar/Aa/Plots 17,18,26,27/"
-  , "D:/T3_DroneLidar/Aa/Plots 28,29,34/"
-  , "D:/T3_DroneLidar/Aa/Plots 28,29,34/"
-  , "D:/T3_DroneLidar/Aa/Plots 16,31/"
-  , "D:/T3_DroneLidar/Aa/Plots 28,29,34/"
-  , "D:/T3_DroneLidar/Ba/Plots 8,9,36,46/"
-  , "D:/T3_DroneLidar/Ba/Plot 37/"
-  , "D:/T3_DroneLidar/Dz/Plots 25,42/"
-  , "D:/T3_DroneLidar/Az/Plots 13,14,23,24,43/"
-  , "D:/T3_DroneLidar/Ba/Plots 8,9,36,46/"
-  , "D:/T3_DroneLidar/Ba/Plots 10,47/"
+  "H:/T3_DroneLidar/Ba/Plot7/"
+  , "H:/T3_DroneLidar/Ba/Plots8_9_36_46/"
+  , "H:/T3_DroneLidar/Ba/Plots8_9_36_46/"
+  , "H:/T3_DroneLidar/Ba/Plots10_47/"
+  , "H:/T3_DroneLidar/Az/Plots13_14_23_24_43/"
+  , "H:/T3_DroneLidar/Az/Plots13_14_23_24_43/"
+  , "H:/T3_DroneLidar/Aa/Plots16_31/"
+  , "H:/T3_DroneLidar/Aa/Plots17_18_26_27/"
+  , "H:/T3_DroneLidar/Aa/Plots17_18_26_27/"
+  , "H:/T3_DroneLidar/Da/Plots20_21_22/"
+  , "H:/T3_DroneLidar/Da/Plots20_21_22/"
+  , "H:/T3_DroneLidar/Da/Plots20_21_22/"
+  , "H:/T3_DroneLidar/Az/Plots13_14_23_24_43/"
+  , "H:/T3_DroneLidar/Az/Plots13_14_23_24_43/"
+  , "H:/T3_DroneLidar/Dz/Plots25_42/"
+  , "H:/T3_DroneLidar/Aa/Plots17_18_26_27/"
+  , "H:/T3_DroneLidar/Aa/Plots17_18_26_27/"
+  , "H:/T3_DroneLidar/Aa/Plots28_29_34/"
+  , "H:/T3_DroneLidar/Aa/Plots28_29_34/"
+  , "H:/T3_DroneLidar/Aa/Plots16_31/"
+  , "H:/T3_DroneLidar/Aa/Plots28_29_34/"
+  , "H:/T3_DroneLidar/Ba/Plots8_9_36_46/"
+  , "H:/T3_DroneLidar/Ba/Plot37/"
+  , "H:/T3_DroneLidar/Dz/Plots25_42/"
+  , "H:/T3_DroneLidar/Az/Plots13_14_23_24_43/"
+  , "H:/T3_DroneLidar/Ba/Plots8_9_36_46/"
+  , "H:/T3_DroneLidar/Ba/Plots10_47/"
 )
 
 # idea is to clip points using the slanted tree represented by the base and top location
@@ -89,7 +99,7 @@ folders$Folder <- c(
 #
 # work through a list of point files and then merge the clips into a single file
 #for (plot in 1:1) {
-for (plot in 1:nrow(folders)) {
+for (plot in 11:nrow(folders)) {
   tic(paste0("Clipping trees for plot ", folders$Plot_Number[plot]))
   trees <- allTrees[allTrees$Plot_Number == folders$Plot_Number[plot],]
 
@@ -296,9 +306,14 @@ for (plot in 1:nrow(folders)) {
 }
 
 # write off combined file
-write.csv(allMerged, paste0("D:/T3_DroneLidar", "/Leaning_TreeTops_normalized_metrics.csv"), row.names = FALSE)
+write.csv(allMerged, paste0("H:/T3_DroneLidar", "/Leaning_TreeTops_normalized_metrics.csv"), row.names = FALSE)
 
 
+
+
+
+
+# small cylinder clips
 
 # work through the folders, clip smaller cylinder for the tree and compute metrics
 
@@ -322,6 +337,40 @@ for (plot in 1:nrow(folders)) {
   # read the metrics to get the high point
   # read the metrics for the non-normalized points and get the highest elevation
   m <- read.csv(outFile, stringsAsFactors = FALSE)
+
+  # this is the fix for 10/25/2023 problem...keeping code above to get FileTitle
+  # build commands to clip to upper portion of each TAO
+  for (i in 1:nrow(m)) {
+    ClipData(m$DataFile[i]
+             , paste0(pointFolder, "Processing/AdjustedTrees/Trees_SmallCylinder/", m$FileTitle[i], ".las")
+             , minx = allTrees$aveTopX[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] - sampleRadius
+             , miny = allTrees$aveTopY[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] - sampleRadius
+             , maxx = allTrees$aveTopX[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] + sampleRadius
+             , maxy = allTrees$aveTopY[allTrees$Plot_Number == folders$Plot_Number[plot] & allTrees$Tag_Num == m$Identifier[i]] + sampleRadius
+             , shape = 1
+    )
+  }
+
+  # create output folder for new tree clips
+  outFile <- paste0(pointFolder, "Processing/AdjustedTrees/Trees_SmallCylinder/SmallCylindermetrics.csv")
+
+  CloudMetrics(paste0(pointFolder, "Processing/AdjustedTrees/Trees_SmallCylinder/", "Plot_", folders$Plot_Number[plot], "*.las")
+               , outFile
+               , new = TRUE
+               , rid = TRUE
+  )
+
+  # read the metrics to get the high point
+  # read the metrics for the non-normalized points and get the highest elevation
+  m <- read.csv(outFile, stringsAsFactors = FALSE)
+
+  # ERROR: 10/25/2023: original code used the leaning tree clip with an estimated crow width
+  # to get the max elevation. If there are branches from an adjacent tree above the target
+  # tree, there may be no points in the small cylinder clip so we loose the tree.
+  # Logic should be using the max elevation in the 1m cylinder, not the entire tree clip.
+  #
+  # easy fix is to do the small cylinder clips and keep all points, run cloudmetrics to get
+  # the max elevation, then use this to clip the top
 
   # compute the elevation for the base of the upper portion
   m$SampleBaseElev <- m$Elev.maximum - topDepth
@@ -383,7 +432,7 @@ for (plot in 1:nrow(folders)) {
 }
 
 # write off combined file
-write.csv(allMerged, paste0("D:/T3_DroneLidar", "/Leaning_TreeTops_SmallCylinder_normalized_metrics.csv"), row.names = FALSE)
+write.csv(allMerged, paste0("H:/T3_DroneLidar", "/Leaning_TreeTops_SmallCylinder_normalized_metrics.csv"), row.names = FALSE)
 
 
 

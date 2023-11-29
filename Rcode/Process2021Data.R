@@ -21,10 +21,10 @@ renameCheck <- function(from = "", to = "") {
 # one DSM file name in riparian files (reach 2) was missing "m" in 0.5m tif image
 
 # projection for for UTM10...this is used for several outputs
-prjFile <- "E:/T3_DroneLidar/UTM10.prj"
+prjFile <- "H:/T3_DroneLidar/UTM10.prj"
 
 # read in the list of project folders
-dirList <- "E:/T3_DroneLidar/dirlist.txt"
+dirList <- "H:/T3_DroneLidar/dirlist.txt"
 dirs <- read.csv2(dirList, header = FALSE)
 
 # fix backslashes
@@ -88,7 +88,8 @@ for (i in 1:length(dirs)) {
 #
 # this loop should start at 1 unless processing was interrupted by a reboot.
 #for (i in 1:length(dirs)) {
-for (i in 1:4) {
+for (i in 13:length(dirs)) {
+  #for (i in 1:4) {
   # set up folder info
   dataFolder <- dirs[i]
   groundFileSpec <- paste0(dirs[i], "/ground/ground.dtm")
@@ -243,23 +244,23 @@ for (i in 1:4) {
   m$SampleBaseElev <- m$Elev.maximum - topDepth
 
   # build commands to clip to upper portion of each TAO
-  for (i in 1:nrow(m)) {
-    ClipData(m$DataFile[i]
-             , paste0(outputFolder, "/TreeTops/", m$FileTitle[i], ".lda")
-             , zmin = m$SampleBaseElev[i]
-             , zmax = m$Elev.maximum[i]
+  for (j in 1:nrow(m)) {
+    ClipData(m$DataFile[j]
+             , paste0(outputFolder, "/TreeTops/", m$FileTitle[j], ".lda")
+             , zmin = m$SampleBaseElev[j]
+             , zmax = m$Elev.maximum[j]
     )
   }
 
   # use the lower elevation value to normalize the upper crown points using ClipData and the /biaselev:minelevation option
   # bias is added to point height so it needs to be negative
   # zmin and zmax are evaluated after bias adjustment so zmin=0 and zmax=topDepth
-  for (i in 1:nrow(m)) {
-    ClipData(m$DataFile[i]
-             , paste0(outputFolder, "/TreeTops_normalized/", m$FileTitle[i], ".lda")
+  for (j in 1:nrow(m)) {
+    ClipData(m$DataFile[j]
+             , paste0(outputFolder, "/TreeTops_normalized/", m$FileTitle[j], ".lda")
              , zmin = 0
              , zmax = topDepth
-             , biaselev = -m$SampleBaseElev[i]
+             , biaselev = -m$SampleBaseElev[j]
     )
   }
 
@@ -315,10 +316,10 @@ for (i in 1:4) {
   # *****************************************************************************
   # ***** this could be better placed in the processing order but we need the ground elevation under the high point
   files <- Sys.glob(paste0(outputFolder, "/Trees/TAOpts/*.lda"))
-  for (i in 1:length(files)) {
-    ClipData(thp$DataFile[i]
-             , paste0(outputFolder, "/Trees/TAOpts_GroundBiased/", basename(thp$DataFile[i]))
-             , biaselev = -thp$GroundElev[i]
+  for (j in 1:length(files)) {
+    ClipData(thp$DataFile[j]
+             , paste0(outputFolder, "/Trees/TAOpts_GroundBiased/", basename(thp$DataFile[j]))
+             , biaselev = -thp$GroundElev[j]
              , class = "~2"
     )
   }
@@ -386,14 +387,14 @@ for (i in 1:4) {
   NormalizedPercentileData$cbh <- 0.0
 
   x <- c(1:99)
-  for (i in 1:nrow(PercentileData)) {
+  for (k in 1:nrow(PercentileData)) {
     slopes <- vector()
     # compute slopes
     for (j in 2:99) {
       x1 <- x[j - 1]
       x2 <- x[j]
-      y1 <- NormalizedPercentileData[i, j -1]
-      y2 <- NormalizedPercentileData[i, j]
+      y1 <- NormalizedPercentileData[k, j -1]
+      y2 <- NormalizedPercentileData[k, j]
       slope_i <- (y2-y1)/(x2-x1)
       slopes <- append(slopes, slope_i)
     }
@@ -401,7 +402,7 @@ for (i in 1:4) {
     # get max slope
     maxSlopeIndex <- which.max(slopes)
     cbhIndex <- maxSlopeIndex + 1
-    NormalizedPercentileData$cbh[i] <- PercentileData[i, cbhIndex + 4]
+    NormalizedPercentileData$cbh[k] <- PercentileData[k, cbhIndex + 4]
   }
 
   # cbh for trees is saved with the NormalizedPercentileData

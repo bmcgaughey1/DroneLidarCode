@@ -90,7 +90,7 @@ makeAdjustedFUSIONTrees <- function(x, R = 0, G = 192, B = 0, statusCode = 0) {
 # to lidar
 # *****************************************************************************
 # *****************************************************************************
-outputFolder <- "E:/Backup/R_Stuff/ONRCDroneLidar"
+outputFolder <- "G:/R_Stuff/ONRCDroneLidar"
 combinedTrees <- read.csv(file = paste0(outputFolder, "/FieldTrees.csv"), stringsAsFactors = FALSE)
 
 # predict height using custom T3 equations
