@@ -1352,7 +1352,6 @@ t
 
 
 
-
 cat("accuracy with all metrics: ", round(100 - 8.347826, 2))
 cat("accuracy with only height metrics: ", round(100 - 11.65217, 2))
 cat("accuracy with only intensity metrics: ", round(100 - 21.3913, 2))
