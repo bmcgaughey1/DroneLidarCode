@@ -192,7 +192,7 @@ set.seed(15356)
 # Another question is the data used for tuning. Should you use the training data only
 # or all data? The tuneRanger() function uses prediction accuracy as the test criteria
 # (measure can be changed) but doesn't use a data split. I think it makes the most sense to
-# tune parameters using the split data but I haven't been able to find any guidence online.
+# tune parameters using the split data but I haven't been able to find any guidance online.
 #
 # I did some testing at the end of the code. A 50/50 or 60/40 split seems to produce
 # a model with fairly low OOB error and low error when predicting the testing data
@@ -438,6 +438,8 @@ if (simpleTune) {
   print(paste("Accuracy for all data: ", accuracy))
 
 }
+
+confusionMatrix(speciesRF$predictions, modelData$Species)
 
 # save model for later use
 if (useLeaningTrees) {
@@ -1249,7 +1251,8 @@ speciesRF <- ranger(Species ~ ., data = sparseData
                     , importance = "none"
 )
 speciesRF
-
+speciesRF$confusion.matrix
+confusionMatrix(speciesRF$predictions, sparseData$Species)
 
 # LOOCV
 useRanger <- TRUE
