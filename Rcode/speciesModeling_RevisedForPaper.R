@@ -569,7 +569,9 @@ t
 # citations for packages --------------------------------------------------
 citation("tuneRanger")
 citation("ranger")
+citation("lidR")
 
+citation()
 # exploratory boxplots of metrics -----------------------------------------
 ggplot(modelData, aes(x = Species, y = Elev.P99)) + geom_boxplot() + theme(axis.text=element_text(size=12, face="bold"), axis.title=element_text(size=14,face="bold"))
 ggplot(modelData, aes(x = Species, y = Elev.P95)) + geom_boxplot()
@@ -659,3 +661,15 @@ ggsave("G:/Bob's Stuff/Documents/FY23/Papers/DF_WH_Classification/RcodeFigures/B
 #     compression = "lzw", width = 4.0, height = 6.0, units = "in", res = 600)
 #print(p)
 #dev.off()
+
+#load the coin library
+library(coin)
+citation("coin")
+#perform Mood's Median Test
+median_test(Elev.P99~Species, data = modelData)
+median_test(Elev.P95~Species, data = modelData)
+median_test(Elev.stddev~Species, data = modelData)
+median_test(Int.L.skewness~Species, data = modelData)
+median_test(Int.mode~Species, data = modelData)
+median_test(Int.P60~Species, data = modelData)
+

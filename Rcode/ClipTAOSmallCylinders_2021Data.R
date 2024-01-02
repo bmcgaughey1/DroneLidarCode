@@ -46,7 +46,7 @@ for (i in 1:length(dirs)) {
 # just a few modifications.
 #
 # this loop should start at 1 unless processing was interrupted by a reboot.
-for (i in 14:length(dirs)) {
+for (i in 1:length(dirs)) {
 #for (i in 1:1) {
   # set up folder info
   dataFolder <- dirs[i]
@@ -110,9 +110,12 @@ for (i in 14:length(dirs)) {
   # use the lower elevation value to normalize the upper crown points using ClipData and the /biaselev:minelevation option
   # bias is added to point height so it needs to be negative
   # zmin and zmax are evaluated after bias adjustment so zmin=0 and zmax=topDepth
+  #
+  # ***** original code produced files with ".lda.lda" extension. I fixed this 12/1/2023 but did not rerun all the clips
+  # however, I did rename all the clip files and fix the CSV files created when this code waas first run.
   for (j in 1:nrow(h)) {
     ClipData(h$DataFile[j]
-             , paste0(outputFolder, "/Trees/SmallCylinderPts_GroundBiased/", basename(h$DataFile[j]), ".lda")
+             , paste0(outputFolder, "/Trees/SmallCylinderPts_GroundBiased/", basename(h$DataFile[j]))
              , zmin = 0
              , zmax = topDepth
              , biaselev = -m$SampleBaseElev[j]

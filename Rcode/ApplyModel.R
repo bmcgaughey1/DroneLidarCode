@@ -2,9 +2,11 @@
 #
 # This code was developed for Plot 27 in Ba. It should work for other areas with minor changes
 #
+# 12/4/2023 code updated to use small cylinder metrics
+#
 # assumes speciesRF is available...see speciesModeling.R code
 #
-library(randomForest)
+library(ranger)
 library(dplyr)
 library(caret)
 library(terra)
@@ -13,6 +15,227 @@ library(mapview)
 
 drawMaps <- FALSE
 #drawMaps <- TRUE
+
+# read in the list of project folders
+dirList <- "H:/T3_DroneLidar/dirlist.txt"
+dirs <- read.csv2(dirList, header = FALSE)
+
+# fix backslashes
+dirs <- lapply(dirs[,1], function(x) {gsub("\\\\", "/", x)})
+
+# read the ranger model
+speciesRF <- readRDS("FINAL_RF_HW_DF_Model_LeaningTrees.rds")
+
+# load code for DBH prediction
+# the custom model I fit for T3 has issues when height value are outside the range of our field data (used to fit the model).
+# Predicted DBH is too large for TSHE
+source("Rcode/predictDBH_Height.R")
+
+# this loop should start at 1 unless testing or processing was interrupted
+#i <- 2
+drawMaps <- FALSE
+for (i in 1:length(dirs)) {
+  cat(i, " of ", length(dirs), "\n")
+
+  outputFolder <- paste0(dirs[i], "/Processing")
+
+  metricsFile <- paste0(outputFolder, "/SmallCylinderPts_GroundBiased_metrics_Corrected.csv")
+
+  # read metrics
+  metrics <- read.csv(metricsFile, stringsAsFactors = FALSE)
+
+  # compute relative percentiles...divide P?? by P99. I use these when dealing with clips of individual trees
+  # to allow the use of percentiles in cases where one species is much higher than another
+  #
+  # for this case with the point clips for the upper 3m of crowns, these are less useful (but still useful)
+  metrics$RP01 <- metrics$Elev.P01 / metrics$Elev.P99
+  metrics$RP05 <- metrics$Elev.P05 / metrics$Elev.P99
+  metrics$RP10 <- metrics$Elev.P10 / metrics$Elev.P99
+  metrics$RP20 <- metrics$Elev.P20 / metrics$Elev.P99
+  metrics$RP25 <- metrics$Elev.P25 / metrics$Elev.P99
+  metrics$RP30 <- metrics$Elev.P30 / metrics$Elev.P99
+  metrics$RP40 <- metrics$Elev.P40 / metrics$Elev.P99
+  metrics$RP50 <- metrics$Elev.P50 / metrics$Elev.P99
+  metrics$RP60 <- metrics$Elev.P60 / metrics$Elev.P99
+  metrics$RP70 <- metrics$Elev.P70 / metrics$Elev.P99
+  metrics$RP75 <- metrics$Elev.P75 / metrics$Elev.P99
+  metrics$RP80 <- metrics$Elev.P80 / metrics$Elev.P99
+  metrics$RP90 <- metrics$Elev.P90 / metrics$Elev.P99
+  metrics$RP95 <- metrics$Elev.P95 / metrics$Elev.P99
+
+  # drop rows where relative percentiles were invalid
+  metrics <- metrics[!is.na(metrics$RP50), ]
+
+  # use model to predict species
+  metrics$Species <- (predict(speciesRF, data = metrics))$predictions
+
+  # read full TAO metrics to get tree heights
+  tm <- read.csv(paste0(outputFolder, "/TAO_GroundBiased_metrics.csv"), stringsAsFactors = FALSE)
+
+  # drop TAOs where the minimum elevation (after ground biasing) is > 5m. I think these occur around
+  # the edges of the DTM
+  tm <- tm[tm$Elev.minimum <= 5, ]
+
+  # drop TAOs where the maximum elevation (after ground biasing) is < 1.37m. These cause problems in the
+  # DBH prediction
+  tm <- tm[tm$Elev.maximum >= 1.37, ]
+
+  # only need Identifier and Elev.maximum
+  tm <- tm[, c(1, 16)]
+  colnames(tm)  <- c("Identifier", "Height")
+
+  # add height to upper 3m metrics
+  metrics <- merge(metrics, tm, by.x = "Identifier", by.y = "Identifier")
+
+  metrics$PredictedDBH <- NA
+  for (i in 1:nrow(metrics)) {
+    metrics$PredictedDBH[i] <- predictDBH(as.character(metrics$Species[i]), metrics$Height[i], method = "customT3", heightUnits = "meters", DBHUnits = "cm")
+  }
+
+  # drop trees with bad predicted DBH
+  metrics <- metrics[!is.nan(metrics$PredictedDBH), ]
+
+  # for new data frame with predictions
+  df <- data.frame(Identifier = metrics$Identifier
+                   , DataFile = metrics$DataFile
+                   , FileTitle = metrics$FileTitle
+                   , PredictedSpecies = metrics$Species
+                   , Height = metrics$Height
+                   , PredictedDBH = metrics$PredictedDBH
+                   )
+
+  # write off predictions
+  write.csv(df, file = paste0(outputFolder, "/SmallCylinder_Predictions.csv"), row.names = FALSE)
+
+  # write off file lists for each species...these can be used to merge TAO point files
+  write.table(df$DataFile[df$PredictedSpecies == "PSME"]
+              , file = paste0(outputFolder, "/Predictions_PSME.txt")
+              , row.names = FALSE
+              , col.names = FALSE
+  )
+  write.table(df$DataFile[df$PredictedSpecies == "TSHE"]
+              , file = paste0(outputFolder, "/Predictions_TSHE.txt")
+              , row.names = FALSE
+              , col.names = FALSE
+  )
+
+  if (drawMaps) {
+    # read polygons for TAOs
+    polys <- st_read(paste0(outputFolder, "/Trees/trees_Polygons.shp"))
+
+    polys <- merge(polys, df, by.x = "BasinID", by.y = "Identifier")
+
+    mapviewOptions(fgb = FALSE)
+    mapview(polys, zcol = "PredictedSpecies", col.regions = c("red", "green", "green"), alpha.regions = 1)
+  }
+
+}
+
+# loop to draw maps and write image file
+pal <-  mapviewPalette("mapviewVectorColors")
+drawMaps <- TRUE
+#i <- 8
+for (i in 1:length(dirs)) {
+  outputFolder <- paste0(dirs[i], "/Processing")
+
+  predictionFile <- paste0(outputFolder, "/SmallCylinder_Predictions.csv")
+
+  # read metrics
+  df <- read.csv(predictionFile, stringsAsFactors = FALSE)
+
+  if (drawMaps) {
+    # read polygons for TAOs
+    polys <- st_read(paste0(outputFolder, "/Trees/trees_Polygons.shp"))
+
+    polys <- merge(polys, df, by.x = "BasinID", by.y = "Identifier")
+
+    mapviewOptions(fgb = FALSE)
+    m <- mapview(polys, zcol = "PredictedSpecies", col.regions = c("red", "green", "green"), alpha.regions = 1, layer.name = c("Predicted Species"))
+    #m <- mapview(polys, zcol = "PredictedDBH", col.regions = pal(100), alpha.regions = 1, layer.name = c("Predicted DBH"))
+
+    m@map %>% leaflet::setZoom(17)
+
+    mapshot(m, file = paste0(outputFolder, "/speciesMap.png"), remove_controls = c("zoomControl", "layersControl", "homeButton",
+                                                                                   "drawToolbar", "easyButton"))
+  }
+}
+
+
+
+
+
+# this is the code that I used to produce map figures for the paper. Above code works but
+# can't easily add north arrow or coordinate grid
+#
+# used Aa/Plots28_29_34 for the paper figure...i = 7
+# all of the positions are set up for this area...other areas may have problems with layout
+#
+# area of this unit is 27.78 ha
+library(ggplot2)
+library(ggspatial)
+
+drawMaps <- TRUE
+i <- 7
+for (i in 1:length(dirs)) {
+  outputFolder <- paste0(dirs[i], "/Processing")
+
+  predictionFile <- paste0(outputFolder, "/SmallCylinder_Predictions.csv")
+
+  # read metrics
+  df <- read.csv(predictionFile, stringsAsFactors = FALSE)
+
+  #file.remove(paste0(outputFolder, "/speciesMap.png"))
+  #file.remove(paste0(outputFolder, "/PredictionMap.png"))
+
+  if (drawMaps) {
+    # read polygons for TAOs
+    polys <- st_read(paste0(outputFolder, "/Trees/trees_Polygons.shp"))
+
+    polys <- merge(polys, df, by.x = "BasinID", by.y = "Identifier")
+
+    p1 <- ggplot() +
+      geom_sf(data = polys, mapping = aes(fill = PredictedSpecies), color = "black", alpha=1.0) +
+      theme(axis.text.y = element_text(angle = 90, hjust = 0.5)) +
+      theme_bw() +
+      theme(legend.position = c(0.75, 0.15)) +
+      theme(legend.key.size = unit(3, "mm"), legend.title = element_text(size = 9), legend.text = element_text(size = 8)) +
+      guides(fill=guide_legend(title="Predicted Species")) +
+      xlab("Longitude") +
+      ylab("Latitude")+
+      coord_sf() +
+      theme(plot.background = element_blank(),
+            #panel.border = element_blank(),
+            plot.margin = unit(c(0, 0, 0 ,0), "mm")) +
+      ggspatial::annotation_north_arrow(location="bl", height = unit(.75, "cm"),
+                                        style = ggspatial::north_arrow_orienteering(text_size = 8),
+                                        width = unit(.5, "cm"), pad_y = unit(2.5, "cm"), pad_x = unit(6.5, "cm")) +
+                                        #width = unit(.5, "cm"), pad_y = unit(8.0, "cm"), pad_x = unit(0.5, "cm")) +
+  ggspatial::annotation_scale(location="bl",
+                                  pad_x = unit(4.5, "cm"), pad_y = unit(0.15, "cm"), text_cex = 0.8, height = unit(0.2, "cm"))
+
+    # save the map
+    tiff(paste0(outputFolder, "/speciesMap.tif"),
+         compression = "lzw", width = 6, height = 4.0, units = "in", res = 600)
+    print(p1)
+    dev.off()
+  }
+}
+
+
+# compute are of unit used for figure in paper
+library(fusionwrapr)
+
+i <- 7
+outputFolder <- paste0(dirs[i], "/Processing")
+CHMFile <- paste0(outputFolder, "/CHM/CHM.dtm")
+
+CHM <- readDTM(CHMFile, epsg = 26910)
+
+goodData <- sum(!is.na(CHM))
+allData <- nrow(CHM) * ncol(CHM)
+area <- goodData * (0.5 * 0.5) / 10000
+
+
 
 # read TAO metrics for upper 3m
 treeMetricsFile <- "E:/T3_DroneLidar/Ba/Plot37/Processing/TreeTops_normalized_metrics_merged.csv"
@@ -146,7 +369,7 @@ if (FALSE) {
   # set the number of residual trees...However, I did not
 }
 
-# these are the correction factors for unit Ba (plot 37). The code in the if stmt aboe gets part of the
+# these are the correction factors for unit Ba (plot 37). The code in the if stmt above gets part of the
 # information needed to compute the correction factors but you also have to use the field data to get
 # the number of live trees on the plot and the basal area for the plot. This could be done with code
 # but I was under a time crunch...
