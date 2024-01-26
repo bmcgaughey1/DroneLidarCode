@@ -27,7 +27,8 @@ useLeaningTrees <- TRUE
 # testing: inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/T3_AdjXY_Training_TreeTops_AllPlots.csv"
 # testing: inputDataFile <- "G:/R_Stuff/ONRCDroneLidar/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
 if (useLeaningTrees) {
-  inputDataFile <- "H:/T3_DroneLidar/Leaning_TreeTops_SmallCylinder_normalized_metrics_10_25_2023.csv"
+#  inputDataFile <- "H:/T3_DroneLidar/Leaning_TreeTops_SmallCylinder_normalized_metrics_10_25_2023.csv"
+  inputDataFile <- "extras/Leaning_TreeTops_SmallCylinder_normalized_metrics_10_25_2023.csv"
 } else {
   inputDataFile <- "extras/AdjustedField_T3_Training_TreeTops_AllPlots.csv"
 }
