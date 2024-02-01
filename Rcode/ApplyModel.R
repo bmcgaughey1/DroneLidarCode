@@ -193,12 +193,16 @@ for (i in 1:length(dirs)) {
 
     polys <- merge(polys, df, by.x = "BasinID", by.y = "Identifier")
 
+    polys$longSpecies <- ""
+    polys$longSpecies[polys$PredictedSpecies == "PSME"] <- "Douglas-fir"
+    polys$longSpecies[polys$PredictedSpecies == "TSHE"] <- "Western hemlock"
+    polys$longSpecies <- as.factor(polys$longSpecies)
     p1 <- ggplot() +
-      geom_sf(data = polys, mapping = aes(fill = PredictedSpecies), color = "black", alpha=1.0) +
+      geom_sf(data = polys, mapping = aes(fill = longSpecies), color = "black", alpha=1.0) +
       theme(axis.text.y = element_text(angle = 90, hjust = 0.5)) +
       theme_bw() +
-      theme(legend.position = c(0.75, 0.15)) +
-      theme(legend.key.size = unit(3, "mm"), legend.title = element_text(size = 9), legend.text = element_text(size = 8)) +
+      theme(legend.position = c(0.725, 0.1)) +
+      theme(legend.key.size = unit(3, "mm"), legend.title = element_text(size = 12), legend.text = element_text(size = 11)) +
       guides(fill=guide_legend(title="Predicted Species")) +
       xlab("Longitude") +
       ylab("Latitude")+
@@ -211,11 +215,11 @@ for (i in 1:length(dirs)) {
                                         width = unit(.5, "cm"), pad_y = unit(2.5, "cm"), pad_x = unit(6.5, "cm")) +
                                         #width = unit(.5, "cm"), pad_y = unit(8.0, "cm"), pad_x = unit(0.5, "cm")) +
   ggspatial::annotation_scale(location="bl",
-                                  pad_x = unit(4.5, "cm"), pad_y = unit(0.15, "cm"), text_cex = 0.8, height = unit(0.2, "cm"))
+                                  pad_x = unit(0.5, "cm"), pad_y = unit(0.1, "cm"), text_cex = 0.8, height = unit(0.2, "cm"))
 
     # save the map
     tiff(paste0(outputFolder, "/speciesMap.tif"),
-         compression = "lzw", width = 6, height = 4.0, units = "in", res = 600)
+         compression = "lzw", width = 4, height = 4.0, units = "in", res = 600)
     print(p1)
     dev.off()
   }
