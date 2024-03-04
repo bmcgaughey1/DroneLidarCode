@@ -26,6 +26,9 @@ source(file.path("predictDBH_Height.R"))
 # function to implement cone clipping
 # basic idea is to specify the XYZ for the cone point and then the slope of the sides (or angle of the cone).
 # putting the point below the ground simulates a conic frustum.
+# *************
+# I revised this function in the Baseheight.R. Corrected problems and added an option to set the base diameter
+# directly. This version can do this but user has to modify the coneZ to get the same effect.
 coneClip <- function(
   pts,
   coneX,

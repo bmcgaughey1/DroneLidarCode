@@ -138,6 +138,16 @@ write.csv(allData, "H:/T3_DroneLidar/Leaning_TreeTops_SmallCylinder_normalized_m
 # but for confusionMatrix output, read down the columns to evaluate
 # *****************************************************************************
 
+# I added this code to read data and drop the row number to work on teh violin plot figure...
+# it might cause problems for the original modeling.
+# start of additions
+allData <- read.csv("H:/T3_DroneLidar/Leaning_TreeTops_SmallCylinder_normalized_metrics_ModelTraining.csv", stringsAsFactors = FALSE)
+allData$Species <- as.factor(allData$Species)
+
+# drop row number
+allData <- allData[, -1]
+# end of additions
+
 # do final prep of data for model tuning ----------------------------------
 modelData <- allData
 
@@ -640,7 +650,7 @@ iP60 <- ggplot(data = modelData, mapping = aes(x=Species, y=Int.P60, fill=Specie
   #  geom_violin(draw_quantiles = c(.50), trim = FALSE) +
   #  xlab("Species") +
   ylab("60th percentile of intensity") +
-  xlab("") +
+  xlab("Species") +
   theme(legend.position="none", text=element_text(size=fs,  family=ff), plot.margin=unit(c(0.2,0.5,0.1,0.1),"cm"))
 mode <- ggplot(data = modelData, mapping = aes(x=Species, y=Int.mode, fill=Species)) +
   geom_violin(draw_quantiles = 0.5) +

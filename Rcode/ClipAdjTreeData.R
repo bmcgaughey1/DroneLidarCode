@@ -99,7 +99,7 @@ folders$Folder <- c(
 #
 # work through a list of point files and then merge the clips into a single file
 #for (plot in 1:1) {
-for (plot in 11:nrow(folders)) {
+for (plot in 1:nrow(folders)) {
   tic(paste0("Clipping trees for plot ", folders$Plot_Number[plot]))
   trees <- allTrees[allTrees$Plot_Number == folders$Plot_Number[plot],]
 
