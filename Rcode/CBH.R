@@ -82,8 +82,6 @@ CBH <- function (
 
 # testing code
 if (F) {
-  library(fusionwrapr)
-
   t <- CBH("extras/trees_normalized_Clip_0000011.las")
   t
 
