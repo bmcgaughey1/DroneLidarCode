@@ -42,6 +42,10 @@ LAS <- readLAS(paste0(FilePath, "trees_normalized_Clip_0000011.las"))
 
 #writeLAS(LAS, paste0(FilePath, "trees_normalized_Clip_0000011.las"))
 
+#FilePath <- "H:/T3_DroneLidar/Ba/Plot37/Processing/Trees/TAOpts_GroundBiased/"
+  
+#LAS <- readLDA(paste0(FilePath, "trees_Clip_0001638.lda"), type = "LAS", LASTemplate = "../extras/DataForPaper/Plot_37.laz")
+
 # compute the percentile data
 PercentileData <- quantile(LAS$Z, seq(0, 1, 0.01))
 
@@ -72,9 +76,9 @@ CorridorWidth <- 1
 # compute slopes using normalized percentile data...ignore the 1st percentile so we
 # don't include ground points. However, on steep slopes, we may need to ignore more
 # points close to the ground.
-x <- c(1:99)
+x <- c(0:99)
 slopes <- vector()
-for (j in 2:99) {
+for (j in 2:100) {
   x1 <- x[j - 1]
   x2 <- x[j]
   y1 <- NormalizedPercentileData[j -1]
@@ -91,8 +95,8 @@ cbh <- PercentileData[cbhIndex]
 # set up for graphs
 nf <- layout( matrix(c(1,1,2,3), nrow=2, byrow=TRUE) )
 
-plot(x = c(1:99),
-     y = NormalizedPercentileData[1:99],
+plot(x = x,
+     y = NormalizedPercentileData[1:100],
      type = "l",
      xlab = "Percentile",
      ylab = "Normalized height",
